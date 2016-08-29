@@ -1,0 +1,867 @@
+@CHARSET "UTF-8";
+
+html, body {
+	margin: 0px;
+	padding: 0px;
+	color: #FFF;
+	background-color: #000;
+	background-repeat: no-repeat;
+	background-position: top center;
+	background-attachment: scroll;
+	min-width: 1000px;
+	min-height: 500px;
+	width: 100%;
+	height: 100%;
+	z-index: -1;
+	overflow: hidden;
+	-webkit-transform: rotate(0deg);
+}
+
+body, td, th {
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+	font-size: 14px;
+}
+
+a, a:link, a:visited {
+	color: #FFF;
+	text-decoration: none;
+}
+
+#DDZ {
+	margin: auto;
+	position: relative;
+	width: 1000px;
+	height: 600px;
+	background-image: url(../img/ddzbg.png);
+}
+
+#Shoe, #Discard, #Dealer, #Player {
+	position: absolute;
+	width: 69px;
+	height: 100px;
+	border: #FFF 1px solid;
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+#Shoe {
+	background-image: url(../img/Shoe.png);
+	left: 42%;
+	top: 10%;
+	-moz-box-shadow: 0px 5px 5px #000;
+	-webkit-box-shadow: 0px 5px 5px #000;
+	z-index: 20;
+}
+
+#Shoe .Card {
+	position: absolute;
+	left: -1px;
+	top: -1px;
+}
+
+#Deck {
+	background-image: url(../img/Stack.gif);
+	-moz-border-radius-topleft: 6px;
+	-moz-border-radius-topright: 6px;
+	-webkit-border-top-left-radius: 6px;
+	-webkit-border-top-right-radius: 6px;
+}
+
+#Operators {
+	position: absolute;
+	left: 20%;
+	top: 60%;
+	width: 400px;
+	height: 60px;
+	margin-left: 10px;
+	margin-top: 0px;
+}
+
+/*
+.selected{
+	transform:scale(1.2,1.2)
+}*/
+.Operator#Plus {
+	background-position: -15px -15px;
+}
+
+.Operator#Minus {
+	background-position: -106px -15px;
+	left: 125px;
+	top: 0px;
+}
+
+.Operator#Multiple {
+	background-position: -198px -15px;
+	left: 250px;
+	top: 0px;
+}
+
+.Operator#Divid {
+	background-position: -290px -15px;
+	left: 375px;
+	top: 0px;
+}
+
+#Actions {
+	position: absolute;
+	left: 20%;
+	top: 250px;
+	width: 400px;
+	height: 60px;
+	margin-left: 0px;
+	margin-top: 0px;
+	z-index: 20;
+}
+
+.Action {
+	position: absolute;
+	width: 60px;
+	height: 60px;
+	-moz-border-radius: 30px;
+	-webkit-border-radius: 30px;
+	display: block;
+	background-image: url(../img/Actions.png);
+}
+
+.Action#Put {
+	left: 50px;
+	top: 50px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	width: 93px;
+	height: 48px;
+	background-image: url(../img/put.png);
+	transform: scale(1.5, 1.5);
+}
+
+.Action#Pass {
+	left: 450px;
+	top: 50px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	width: 93px;
+	height: 48px;
+	background-image: url(../img/pass.png);
+	transform: scale(1.5, 1.5);
+}
+
+.Action#Point0 {
+	background-image: url(../img/point0.png);
+	background-position: 0px 0px;
+	left: 100px;
+	top: 0px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	width: 93px;
+	height: 48px;
+	transform: scale(1.2, 1.2);
+}
+
+.Action#Point1 {
+	left: 200px;
+	top: 0px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	width: 93px;
+	height: 48px;
+	background-image: url(../img/point1.png);
+	transform: scale(1.2, 1.2);
+}
+
+.Action#Point2 {
+	left: 300px;
+	top: 0px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	width: 93px;
+	height: 48px;
+	background-image: url(../img/point2.png);
+	transform: scale(1.2, 1.2);
+}
+
+.Action#Point3 {
+	left: 400px;
+	top: 0px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	width: 93px;
+	height: 48px;
+	background-image: url(../img/point3.png);
+	transform: scale(1.2, 1.2);
+}
+
+.Action#Help {
+	position: absolute;
+	background-image: url(../img/help.jpg);
+	left: 200px;
+	top: -250px;
+	transform: scale(0.8, 0.8)
+}
+
+.Action#Setup {
+	position: absolute;
+	background-image: url(../img/setup.png);
+	left: 300px;
+	top: -250px;
+	transform: scale(0.8, 0.8)
+}
+
+.offline {
+	position: absolute;
+	background-image: url(../img/offline.png);
+	left: 90%;
+	top: 10px;
+	width: 60px;
+	height: 60px;
+	-moz-box-shadow: 0px 5px 5px #000;
+	-webkit-box-shadow: 0px 5px 5px #000;
+}
+
+.cyr {
+	position: absolute;
+	text-align: center;
+	margin-top: 0px;
+	left: 50%;
+	top: 95%;
+}
+
+.log {
+	position: absolute;
+	text-align: center;
+	margin-top: 0px;
+	left: 50%;
+	top: 97%;
+}
+
+#Cards {
+	position: absolute;
+	z-index: 15;
+	left: 0%;
+	top: 0%;
+	margin-left: 0px;
+	margin-top: 0px;
+	width: 1000px;
+	height: 600px;
+}
+
+#Cards #Player1Cards {
+	position: absolute;
+	left: 0px;
+	top: 375px;
+	width: 300px;
+	height: 150px;
+}
+
+#Cards #Player1PlayedCards {
+	position: absolute;
+	left: 35%;
+	top: 150px;
+	width: 300px;
+	height: 150px;
+	transform: scale(0.8, 0.8);
+}
+
+#Cards #Player2Cards {
+	position: absolute;
+	left: 75%;
+	top: 28%;
+	width: 300px;
+	height: 150px;
+	/*transform: scale(0.8, 0.8);*/
+}
+
+#Cards #Player2PlayedCards {
+	position: absolute;
+	left: 60%;
+	top: 10%;
+	width: 300px;
+	height: 150px;
+	transform: scale(0.8, 0.8);
+}
+
+#Cards #Player3Cards {
+	position: absolute;
+	left: -10%;
+	top: 28%;
+	width: 300px;
+	height: 150px;
+	/*transform: scale(0.8, 0.8);*/
+}
+
+#Cards #Player3PlayedCards {
+	position: absolute;
+	left: 10%;
+	top: 15%;
+	width: 300px;
+	height: 150px;
+	transform: scale(0.8, 0.8);
+}
+
+#Cards #PlayedCards {
+	position: absolute;
+	left: 30%;
+	top: 10%;
+	margin-top: 40px;
+	width: 600px;
+	height: 200px;
+	z-index: 10;
+}
+
+#Cards #LandownerCards {
+	position: absolute;
+	left: 18%;
+	top: -40px;
+	width: 200px;
+	height: 150px;
+	transform: scale(0.7, 0.7);
+}
+
+.Card {
+	width: 68.5px;
+	height: 99px;
+	display: block;
+	position: absolute;
+}
+
+span {
+	vertical-align: middle;
+}
+
+.CardT {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 136px;
+	height: 198px;
+	margin-left: 0px;
+	margin-top: -50px;
+	text-align: center;
+	vertical-align: middle;
+	font-size: 60px;
+	border: 2px #FFF solid;
+	background-image: url(../img/Black_Alpha25.png);
+	-moz-border-radius: 24px;
+	-webkit-border-radius: 24px;
+	-moz-box-shadow: 0px 5px 5px #000;
+	-webkit-box-shadow: 0px 5px 5px #000;
+}
+
+#Card1 {
+	top: 0px;
+	left: 0px;
+}
+
+#Card2 {
+	top: 0px;
+	left: 200px;
+}
+
+.Front, .Back {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	background-color: #FFF;
+	-moz-box-shadow: 0px 5px 5px #000;
+	-webkit-box-shadow: 0px 5px 5px #000;
+}
+
+.Front {
+	background-image: url(../img/Back.png);
+}
+
+.Back {
+	
+}
+
+.Clubs {
+	background-image: url(../img/Clubs.png);
+}
+
+.Diamonds {
+	background-image: url(../img/Diamonds.png);
+}
+
+.Hearts {
+	background-image: url(../img/Hearts.png);
+}
+
+.Spades {
+	background-image: url(../img/Spades.png);
+}
+
+.Ace {
+	background-position: -0px 0px;
+}
+
+.Two {
+	background-position: -138px 0px;
+}
+
+.Three {
+	background-position: -276px 0px;
+}
+
+.Four {
+	background-position: -414px 0px;
+}
+
+.Five {
+	background-position: -552px 0px;
+}
+
+.Six {
+	background-position: -690px 0px;
+}
+
+.Seven {
+	background-position: -827px 0px;
+}
+
+.Eight {
+	background-position: -965px 0px;
+}
+
+.Nine {
+	background-position: -1103px 0px;
+}
+
+.Ten {
+	background-position: -1241px 0px;
+}
+
+.Jack {
+	background-position: -1378px 0px;
+}
+
+.Queen {
+	background-position: -1516px 0px;
+}
+
+.King {
+	background-position: -1654px 0px;
+}
+
+.LittleJoker {
+	background-image: url(../img/jokers1.png);
+	background-position: -133px 0px;
+}
+
+.BigJoker {
+	background-image: url(../img/jokers1.png);
+	background-position: 0px 0px;
+}
+
+.Locked {
+	opacity: 0.25;
+}
+
+#Message {
+	display: none;
+	width: 400px;
+	height: 60px;
+	position: absolute;
+	left: 50%;
+	top: 30%;
+	margin-left: -200px;
+	margin-top: -100px;
+	padding-top: 50px;
+	font-size: 30px;
+	text-align: center;
+	vertical-align: middle;
+	color: #FFF;
+	border: medium solid #FFF;
+	-webkit-border-radius: 100px;
+	-moz-border-radius: 100px;
+	z-index: 100;
+	background-image: url(../img/Black_Alpha25.png);
+	-moz-box-shadow: 0px 5px 5px #000;
+	-webkit-box-shadow: 0px 5px 5px #000;
+}
+
+/*
+#Table {
+	background-attachment:scroll;
+	background-image: url(../img/Table.png);
+	background-repeat: no-repeat;
+	background-position: top center;
+	height: 500px;
+	width: 100%;
+	overflow: visible;
+	position: absolute;
+	z-index:0;
+}
+*/
+.Score {
+	border: 1px #FFF solid;
+	-moz-border-radius: 24px;
+	-webkit-border-radius: 24px;
+	padding: 2px;
+	min-width: 24px;
+	text-margin: 50px; top : 112px;
+	left: 25px;
+	font-size: 20px;
+	text-align: center;
+	background-position: 0px 20px;
+	background-image: url(../img/coin.jpg);
+	top: 112px;
+}
+
+#Points {
+	position: absolute;
+	border: 1px #FFF solid;
+	width: 36px;
+	heigth: 36px;
+	-moz-border-radius: 36px;
+	-webkit-border-radius: 36px;
+	padding: 2px;
+	min-width: 36px;
+	top: 10px;
+	left: 730px;
+	font-size: 32px;
+	text-align: center;
+	background-color: green;
+}
+
+.Player {
+	background-image: url(../img/Black_Alpha25.png);
+	position: absolute;
+	width: 200px;
+	height: 50px;
+	font-size: 36px;
+	text-align: center;
+	border: 2px #FFF solid;
+	-moz-border-radius: 16px;
+	-webkit-border-radius: 16px;
+	-moz-box-shadow: 0px 5px 5px #000;
+	-webkit-box-shadow: 0px 5px 5px #000;
+	z-index:16;
+}
+
+.Player.selected {
+	background-image: url(../img/Red_Alpha25.png);
+}
+
+#player1 {
+	left: 400px;
+	top: 330px;
+}
+
+#player2 {
+	left: 80%;
+	top: 1%;
+}
+
+#player3 {
+	left: 0%;
+	top: 1%;
+}
+
+#landowner {
+	position: absolute;
+	left: 53%;
+	top: 10%;
+	background-image: url(../img/landowner.png);
+	width: 109px;
+	height: 118px;
+	z-index: 20;
+	transform: scale(0.8);
+}
+
+#nongming1 {
+	position: absolute;
+	left: 50%;
+	top: 18%;
+	background-image: url(../img/nongming.png);
+	width: 83px;
+	height: 121px;
+	z-index: 20;
+	transform: scale(0.8);
+}
+
+#nongming2 {
+	position: absolute;
+	left: 60%;
+	top: 18%;
+	background-image: url(../img/nongming.png);
+	width: 83px;
+	height: 121px;
+	z-index: 20;
+	transform: scale(0.8);
+}
+
+.setup .inputtype {
+	/*background-image: url(../img/Black_Alpha25.png);*/
+	position: absolute;
+	width: 330px;
+	height: 50px;
+	font-size: 36px;
+	text-align: left;
+	border: 0px #FFF solid;
+	-moz-border-radius: 16px;
+	-webkit-border-radius: 16px;
+	-moz-box-shadow: 0px 5px 5px #000;
+	-webkit-box-shadow: 0px 5px 5px #000;
+	margin-left:10px;
+}
+
+.setup .switch{
+	position: absolute;
+
+	width: 125px;
+	height: 50px;
+	font-size: 36px;
+	text-align: left;
+	border: 0px #FFF solid;
+	-moz-border-radius: 16px;
+	-webkit-border-radius: 16px;
+	-moz-box-shadow: 0px 5px 5px #000;
+	-webkit-box-shadow: 0px 5px 5px #000;
+	margin-left:10px;
+}
+
+.setup #speakersw {
+	position: absolute;
+	left: 200px;
+	top: 5%;
+}
+
+.setup #onlinesw {
+	position: absolute;
+	left: 0px;
+	top: 5%;
+}
+.setup input[type=checkbox]{
+	position: absolute;
+	left: 80px;
+	top: 10%;
+	width:30px;
+	height:30px;
+}
+
+
+.setup #player1 {
+	left: 0px;
+	top: 20%;
+}
+
+.setup #player2 {
+	position: absolute;
+	left: 0%;
+	top: 35%;
+}
+
+.setup #player3 {
+	position: absolute;
+	left: 0%;
+	top: 50%;
+}
+
+.setup #room {
+	position: absolute;
+	left: 0%;
+	top: 65%;
+}
+
+.setup input{
+	position: absolute;
+	left: 130px;
+	top: 5px;
+	background-image: url(../img/Black_Alpha25.png);
+}
+
+.setup input#roomid{
+	position: absolute;
+	width:100px;
+	heigth:20px;
+}
+
+.setup input#level{
+	position: absolute;
+	left:230px;
+	width:60px;
+	heigth:20px;
+}
+
+#TimeRemain {
+	position: absolute;
+	left: 60%;
+	top: 5px;
+	width: 80px;
+	height: 40px;
+	margin-top: 0px;
+	font-size: 32px;
+	opacity: 0.75;
+	text-align: center;
+	overflow: visible;
+	text-shadow: 0px 5px #000;
+	border: 4px #EEE solid;
+	-moz-border-radius: 16px;
+	-webkit-border-radius: 16px;
+	-moz-box-shadow: 0px 5px 5px #000;
+	-webkit-box-shadow: 0px 5px 5px #000;
+	background-color:red;
+}
+
+.help {
+	position: absolute;
+	text-align: left;
+	margin-top: 0px;
+	left: 20%;
+	top: 20%;
+	width: 60%;
+	height: 60%;
+	/*background-image:url(../img/Black_Alpha25.png);*/
+	font-size: 16px;
+	z-index: 100;
+}
+
+.help textarea {
+	position: absolute;
+	text-align: left;
+	margin-top: 0px;
+	left: 0%;
+	top: 0%;
+	width: 100%;
+	height: 100%;
+	background-image: url(../img/Black_Alpha25.png);
+	font-size: 16px;
+}
+
+.help a {
+	position: absolute;
+	text-align: left;
+	margin-top: 0px;
+	left: 70%;
+	top: 95%;
+	width: 200px;
+	height: 20px;
+	font-size: 20px;
+	z-index:20;
+	color:red;
+}
+
+.Chat {
+	position: absolute;
+	text-align: left;
+	margin: 10px auto;
+	margin-top: 30px;
+	left: 30%;
+	top: 10%;
+	width: 190px;
+	height: 40px;
+	background-image: url(../img/Black_Alpha25.png);
+	font-size: 30px;
+	margin-left: 0px;
+	text-align: left;
+	border: 1px #FFF solid;
+	padding: 20px 15px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	-moz-box-shadow: 0px 5px 5px #000;
+	-webkit-box-shadow: 0px 5px 5px #000;
+	z-index: 20;
+}
+
+.Chat select{
+	position: absolute;
+	left: 10px;
+	top: 10px;
+	font-size: 20px;
+}
+
+.Chat #button{
+	position: absolute;
+	left: 150px;
+	top: 10px;
+	font-size: 20px;
+}
+
+.Chat #chatmessage{
+	position: absolute;
+	left: 10px;
+	top: 40px;
+	width:195px;
+}
+
+.setup {
+	position: absolute;
+	text-align: left;
+	margin: 110px auto;
+	margin-top: 30px;
+	left: 30%;
+	top: 10%;
+	width: 350px;
+	height: 400px;
+	background-image: url(../img/Black_Alpha25.png);
+	font-size: 40px;
+	margin-left: 0px;
+	text-align: left;
+	border: 1px #FFF solid;
+	padding: 20px 20px;
+	-moz-border-radius: 24px;
+	-webkit-border-radius: 24px;
+	-moz-box-shadow: 0px 5px 5px #000;
+	-webkit-box-shadow: 0px 5px 5px #000;
+	z-index: 20;
+}
+
+.setup .Action#OK {
+	position: absolute;
+	background-image: url(../img/ok.jpg);
+	background-position: 0px 0px;
+	width: 60px;
+	height: 60px;
+	-moz-border-radius: 30px;
+	-webkit-border-radius: 30px;
+	left: 30%;
+	top: 80%;
+}
+
+.setup .Action#Cancel {
+	position: absolute;
+	background-image: url(../img/cancel.jpg);
+	background-position: 0px 0px;
+	width: 60px;
+	height: 60px;
+	-moz-border-radius: 30px;
+	-webkit-border-radius: 30px;
+	left: 60%;
+	top: 80%;
+}
+
+input[type=text], input[type=password] {
+	border-color: #bbb;
+	height: 30px;
+	font-size: 14px;
+	border-radius: 2px;
+	outline: 0;
+	border: #ccc 1px solid;
+	padding: 0 0px;
+	width: 50%;
+	-webkit-transition: box-shadow .5s;
+	margin-bottom: 10px;
+}
+
+input[type=text]:hover, input[type=text]:focus, input[type=password]:hover,
+	input[type=password]:focus {
+	border: 1px solid #56b4ef;
+	box-shadow: inset 0 1px 3px rgba(0, 0, 0, .05), 0 0 8px
+		rgba(82, 168, 236, .6);
+	-webkit-transition: box-shadow .5s;
+}
+
+input::-webkit-input-placeholder {
+	color: #999;
+	-webkit-transition: color .5s;
+}
+
+input:focus::-webkit-input-placeholder, input:hover::-webkit-input-placeholder
+	{
+	color: #c2c2c2;
+	-webkit-transition: color .5s;
+}
+
+
