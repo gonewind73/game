@@ -13,13 +13,16 @@
 
 from threading import Timer
 import time
+import json
 
 heartbeattime=30
 
 class Player(object):
     HEART_BEAT=30
-    def __init__(self,playerid,nickname,playertype=0,wealth=100):
+    def __init__(self,playerid,nickname="",playertype=0,wealth=100):
         self.playerId=playerid
+        if(nickname==""):
+            nickname=playerid
         self.nickname=nickname
         self.wealth=wealth
         self.playerType=playertype  # 1 human  2 automan 3 online?  
@@ -80,32 +83,48 @@ class Table(object):
         
         
     def enter(self,player):
+        count=self.pack()
+
+        
         if(player.isAlive()):
-            self.players.append(player)
+            index=self.index(player.playerId)
+            if(index>=0):
+                self.players[index].startBeat()
+            else:
+                if(count>=self.tableSize):
+                    return False,{"returncode":40002,"errormessage":"The table is full."};            # over max    
+                self.players.append(player)
+                self.broadcast(player.nickname+" is in table!", "system")
         self.getOwner()
-        pass
+        return True,self.getTableInfo()
     
     def leave(self,player):
-        index=self.index(player)
+        index=self.index(player.playerId)
         if(index>=0):
+            self.broadcast(player.nickname+" leave the table!", "system")
             del self.players[index]
         self.getOwner()
         pass
     
-    def index(self,player):
+    def getPlayer(self,playerid):
+        index=self.index(playerid)
+        if(index>=0):
+            return self.players[index]
+        return None
+        
+    def index(self,playerid):
+        self.pack()
         for i in range(0,len(self.players)):
-            if(self.players[i].playerId==player.playerId):
+            if(self.players[i].playerId==playerid):
                 return i
         return -1
     
-    def len(self):
-        count=0
-        for i in range(len(self.players)-1,-1,-1):
-            if(self.players[i].isAlive()):
-                count+=1
-            else:
-                del self.players[i]
-        return count
+    def pack(self):
+        for p in self.players:
+            if(not p.isAlive()):
+                self.broadcast(p.nickname+" leave the table!", "system")
+                self.players.remove(p)
+        return len(self.players)
     
     def getOwner(self):
         for p in self.players:
@@ -114,51 +133,63 @@ class Table(object):
                 return p
     
     def broadcast(self,content,sender):
+        self.pack()
         for p in self.players:
             if(p.isAlive()):
                 p.messageBox.pushMessage(content,sender,time.time())
         pass
     
     def getTableInfo(self):
+        self.pack()
         players={}
         for p in self.players:
             if(p.isAlive()):
                 players[p.playerId]=p.name
         
-        tableinfo={"roomid":self.tableId,
+        tableinfo={"tableid":self.tableId,
               "owner":self.owner.playerId,
-              "roomsize":self.len(),
-              "peers":players,
+              "tablesize":self.tableSize,
+              "players":players,
             }
         
         return tableinfo
         
 class Hall(object):
-    def __init__(self,hallId,name,hallsize=3):
+    def __init__(self,hallId,name="",hallsize=6):
         self.hallId=hallId
+        if(name==""):
+            name=hallId
         self.name=name
         self.hallSize=hallsize
-        self.tables=[]
+        for i in range(0,hallsize):
+            self.tables.append(Table(i.tostring()))
         
     
-    def index(self,table):
-        for i in range(0,len(self.players)):
-            if(self.tables[i].tableId==table.tableId):
+    def index(self,tableid):
+        for i in range(0,self.length()):
+            if(self.tables[i].tableId==tableid):
                 return i
         return -1
     
-    def addTable(self,table):
-        if(self.index(table)<0):
-            self.tables.append(table)
+    def getTable(self,tableid):
+        index=self.index(tableid)
+        if(index>=0):
+            return self.tables[index]
+        else:
+            return None
     
-    def len(self):
-        count=0
-        for i in range(len(self.tables)-1,-1,-1):
-            if(self.tables[i].len()>0):
-                count+=1
-            else:
-                del self.tables[i]
-        return count
+    def addTable(self,table):
+        index=self.index(table.tableId)
+        if(index<0):
+            self.tables.append(table)
+            index=self.length()-1
+        return 
+    
+    def pack(self):
+        for t in self.tables:
+            if(t.pack()==0):
+                self.tables.remove(t)
+        return len(self.tables)
     
     def broadcast(self,content,sender):
         for t in self.tables:
@@ -173,9 +204,61 @@ class Hall(object):
               "hallsize":self.len(),
               "tables":tables,
             }
-        return hallinfo            
+        return hallinfo     
+    
+'''
+Game
+ post action=login with form{ username= password=}
+ return data={playerid,nickname}
+ 
+ post action=enterhall&hallid=ddz  
+ return hallinfo
+ 
+ post action=intable&tableid=1&hallid=ddz with data={playerid:test,nickname:name}
+ return tableinfo
+ 
+ 
+'''       
         
-
+class Game(object):
+    
+    def __init__(self):
+        self.halls={}
+        
+        
+    def addHall(self,hallid,hallname):
+        hall=Hall(hallid,hallname,6)
+        self.halls.append({hallid:hall})
+        return hall
+        
+    def process(self,request):
+        action = request.args['action']   
+        if(action=="enterhall"):
+            hallid=request.args["hallid"]
+            hall=self.halls[hallid]
+            if(hall==None):
+                hall=self.addHall(hallid, hallid)
+            return hall.getHallInfo()
+        elif(action=="intable"):
+            hallid=request.args["hallid"]
+            hall=self.halls[hallid]
+            tableid=request.args["tableid"]
+            table=hall.getTable(tableid)
+            if(table==None):
+                return {"returncode":40001,"errormessage":"table not found!"}
+            data=request.data
+            player=json.loads(data)
+            ok,rinfo=table.enter(player["playerid"],player["nickname"])
+            print(rinfo)
+            if(ok):
+                return rinfo;
+                
+        pass
+    
+    
+    
+    
+    
 class room(object):
     roomid=""
     owner=""
