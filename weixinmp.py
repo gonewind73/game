@@ -100,10 +100,11 @@ class WeixinMp(object):
         respdict["FromUserName"] = reqdict["ToUserName"]
         respdict["CreateTime"] = reqdict["CreateTime"]
         respdict["MsgType"] = "link"
-        respdict["MsgId"] = reqdict["CreateTime"]
-        respdict["Url"]="http://heguofeng.pythonanywhere.com/doudizhu"
-        respdict["Description"]="斗地主，老少皆宜"
         respdict["Title"]="斗地主"
+        respdict["Description"]="斗地主，老少皆宜"
+        respdict["Url"]="http://heguofeng.pythonanywhere.com/doudizhu"
+        respdict["MsgId"] = reqdict["CreateTime"]
+        
         return respdict;
                                                                      
     
@@ -127,7 +128,8 @@ class WeixinMp(object):
         elif(status==2):
             text= url.replace("."," .") + " 状态未知，请谨慎访问！如要继续访问，请去除 。前空格"
             
-        return self.textMessage(reqdict, text)
+        #return self.textMessage(reqdict, text)
+        return self.linkMessage(reqdict, text)
 
     def xmltodict(self, tree):
         tempdict = {}

@@ -164,18 +164,15 @@ class Hall(object):
         for t in self.tables:
             t.broadcast(content,sender)
     
-    def getTableInfo(self):
-        players={}
-        for p in self.players:
-            if(p.isAlive()):
-                players[p.playerId]=p.name
+    def getHallInfo(self):
+        tables={}
+        for t in self.tables:
+            tables[t.tableId]=t.getTableInfo()
         
-        hallinfo={"roomid":self.hallId,
-              "owner":self.owner.playerId,
-              "roomsize":self.len(),
-              "peers":players,
+        hallinfo={"hallid":self.hallId,
+              "hallsize":self.len(),
+              "tables":tables,
             }
-        
         return hallinfo            
         
 
