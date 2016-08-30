@@ -1,5 +1,6 @@
 '''
- * get(roomid,peerid,nickname)
+
+ get(roomid,peerid,nickname)
  * return json{
  *   roomid:*,
  *   owner: peerid,
@@ -10,9 +11,173 @@
  *   }
 '''
 
-import json
 from threading import Timer
+import time
+
 heartbeattime=30
+
+class Player(object):
+    HEART_BEAT=30
+    def __init__(self,playerid,nickname,playertype=0,wealth=100):
+        self.playerId=playerid
+        self.nickname=nickname
+        self.wealth=wealth
+        self.playerType=playertype  # 1 human  2 automan 3 online?  
+        self.startBeat()
+        self.messageBox=MessageBox()
+        pass
+    
+    def startBeat(self):
+        self.heartBeats=self.HEART_BEAT    # <0 no beat
+        if(self.hbtimer==None):
+            self.hbtimer=Timer(5,self.beat)
+            self.hbtimer.start()
+        
+    def beat(self):
+        self.heartBeats-=5;
+        if(self.heartBeats>0):
+            self.hbtimer=Timer(5,self.beat)
+        else:
+            self.hbtimer=None
+    
+    def isAlive(self):
+        return self.heartBeats>0
+    
+
+class MessageBox():
+    def __init__(self):
+        self.lastId=0
+        self.messageBox=[]
+    
+    def pushMessage(self,content,sender,sendtime):
+        self.messageBox.append(Message(self.lastId,content,sender,sendtime))
+        self.lastId+=1
+        return
+    
+    def pushContent(self):
+        pass
+    
+    def popMessage(self):
+        return self.messageBox.pop()
+
+class Message():
+    def __init__(self,messageid,content,sender,sendtime):
+        self.messageId=messageid
+        self.content=content
+        self.sender=sender
+        self.sendtime=sendtime
+        pass
+
+    
+    
+class Table(object):
+    def __init__(self,tableId,name,tablesize=3):
+        self.tableId=tableId
+        self.name=name
+        self.tableSize=tablesize
+        self.owner=None
+        self.players=[]
+        
+        
+    def enter(self,player):
+        if(player.isAlive()):
+            self.players.append(player)
+        self.getOwner()
+        pass
+    
+    def leave(self,player):
+        index=self.index(player)
+        if(index>=0):
+            del self.players[index]
+        self.getOwner()
+        pass
+    
+    def index(self,player):
+        for i in range(0,len(self.players)):
+            if(self.players[i].playerId==player.playerId):
+                return i
+        return -1
+    
+    def len(self):
+        count=0
+        for i in range(len(self.players)-1,-1,-1):
+            if(self.players[i].isAlive()):
+                count+=1
+            else:
+                del self.players[i]
+        return count
+    
+    def getOwner(self):
+        for p in self.players:
+            if(p.isAlive()):
+                self.owner=p
+                return p
+    
+    def broadcast(self,content,sender):
+        for p in self.players:
+            if(p.isAlive()):
+                p.messageBox.pushMessage(content,sender,time.time())
+        pass
+    
+    def getTableInfo(self):
+        players={}
+        for p in self.players:
+            if(p.isAlive()):
+                players[p.playerId]=p.name
+        
+        tableinfo={"roomid":self.tableId,
+              "owner":self.owner.playerId,
+              "roomsize":self.len(),
+              "peers":players,
+            }
+        
+        return tableinfo
+        
+class Hall(object):
+    def __init__(self,hallId,name,hallsize=3):
+        self.hallId=hallId
+        self.name=name
+        self.hallSize=hallsize
+        self.tables=[]
+        
+    
+    def index(self,table):
+        for i in range(0,len(self.players)):
+            if(self.tables[i].tableId==table.tableId):
+                return i
+        return -1
+    
+    def addTable(self,table):
+        if(self.index(table)<0):
+            self.tables.append(table)
+    
+    def len(self):
+        count=0
+        for i in range(len(self.tables)-1,-1,-1):
+            if(self.tables[i].len()>0):
+                count+=1
+            else:
+                del self.tables[i]
+        return count
+    
+    def broadcast(self,content,sender):
+        for t in self.tables:
+            t.broadcast(content,sender)
+    
+    def getTableInfo(self):
+        players={}
+        for p in self.players:
+            if(p.isAlive()):
+                players[p.playerId]=p.name
+        
+        hallinfo={"roomid":self.hallId,
+              "owner":self.owner.playerId,
+              "roomsize":self.len(),
+              "peers":players,
+            }
+        
+        return hallinfo            
+        
 
 class room(object):
     roomid=""

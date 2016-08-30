@@ -93,7 +93,19 @@ class WeixinMp(object):
         respdict["Content"] = text
         respdict["MsgId"] = reqdict["CreateTime"]
         return respdict;
-                                        
+ 
+    def linkMessage(self,reqdict,text):
+        respdict = {}
+        respdict["ToUserName"] = reqdict["FromUserName"]
+        respdict["FromUserName"] = reqdict["ToUserName"]
+        respdict["CreateTime"] = reqdict["CreateTime"]
+        respdict["MsgType"] = "link"
+        respdict["MsgId"] = reqdict["CreateTime"]
+        respdict["Url"]="http://heguofeng.pythonanywhere.com/doudizhu"
+        respdict["Description"]="斗地主，老少皆宜"
+        respdict["Title"]="斗地主"
+        return respdict;
+                                                                     
     
     def checkurl(self, reqdict):
         #to do check the url status 
