@@ -27,12 +27,7 @@
  */
 
 var G24P = {
-	timeRemain:0,
-	//timer:null,
-	//autoexpr:"",
-	player:null,
 	table:null,
-	isOnline:false,
 	Orientation:0,
 	Scale:1,
 }
@@ -110,28 +105,26 @@ function showOperators(){
 function showPlayers(){
 	if(G24P.table.players!=null){
 		var players=G24P.table.players;
-		//log(players)
 		$(".Player").remove()
 		
 		for(var i=0;i<players.length;i++){
 			showPlayer(players[i])
-			//log(G24P.player)
-			if(players[i].id==G24P.player.id){
-				$(".Player#"+G24P.player.getHtmlId()).addClass("P1")
+			if(players[i].id==G24P.table.selfid){
+				$(".Player#"+players[i].getHtmlId()).addClass("P1")
 			}else{
 				$(".Player#"+players[i].getHtmlId()).addClass("P0")
 			}
 		}
 		if(G24P.table.stage=="playing"){
-			$("#"+G24P.table.racer).addClass("selected")
+			$("#table .Players #"+G24P.table.racer).addClass("selected")
 		}
 			
 	}
 	$('.Player').click(function(e) {
 		if(G24P.table.stage=="racing"){
-			G24P.player.action("race",$(this).attr("id"))
+			G24P.table.players.getPlayer(G24P.table.selfid).action("race",$(this).attr("id"))
 		}else{
-			if(G24P.isOnline){
+			if(G24P.table.isOnline){
 				$(".Chat #button").attr("name",$("#"+$(this).attr("id")+" .Nickname").text())
 				$(".Chat").show();
 			}
@@ -149,7 +142,7 @@ function chatmessage() {
 	if(message==""){
 		message=$("#presetmessage").attr("value");
 	}
-	G24P.table.broadcast({"message":$(".Chat #button").attr("name")+","+message,"sender":G24P.player.id})
+	G24P.table.broadcast({"message":$(".Chat #button").attr("name")+","+message,"sender":G24P.table.selfid})
 	$(".Chat").hide();
 }
 
@@ -218,7 +211,7 @@ function g24pUIEvent(){
 	var ns = 0.85
 	var os = 1
 	$('#Shoe').click(function(e) {
-		G24P.player.action("deal","")
+		G24P.table.players.getPlayer(G24P.table.selfid).action("deal","")
 	}).hover(function() {
 		$(this).stop().animate({
 			scale : os + 0.15
@@ -244,8 +237,7 @@ function g24pUIEvent(){
 		
 	$('#Actions a.Action')
 	.animate({scale : ns}, 0).click(function(e) {
-		//uiAction($("#Player"),$(this).attr('id'))
-		G24P.player.action($(this).attr('id'),"")
+		G24P.table.players.getPlayer(G24P.table.selfid).action($(this).attr('id'),"")
 		return false
 		}).hover(function() {
 		$(this).stop().animate({
@@ -257,7 +249,7 @@ function g24pUIEvent(){
 			}, 125);
 		})
 	$('a.Operator').click(function(e){
-		G24P.player.action("operatorclick",$(this).attr('id'))
+		G24P.table.players.getPlayer(G24P.table.selfid).action("operatorclick",$(this).attr('id'))
 	})
 	
 	$('.Speaker').click(function(e){
@@ -275,8 +267,6 @@ function g24pUIEvent(){
 		saveConfig()
 		loadConfig()
 	})
-	
-	
 }
 
 function showCard(card,whoid){
@@ -393,10 +383,10 @@ function uiAction(entity, action) {
 	switch (action) {
 	case ('redo'):
 	case ('auto'):
-		G24P.player.action(action,"")
+		G24P.table.players.getPlayer(G24P.table.selfid).action(action,"")
 		break
 	case ('cardclick'):
-		G24P.player.action(action,entity)
+		G24P.table.players.getPlayer(G24P.table.selfid).action(action,entity)
 		break
 	case ('Start'):
 		Start(entity)
@@ -441,8 +431,8 @@ function login(playerid,password){
 				$('.LoginUI').show()
 			}else{
 				$('.LoginUI').hide()
-				G24P.player=g24pPlayer.load(djson["player"])
-				selectTable()
+				var player=g24pPlayer.load(djson["player"])
+				selectTable(player)
 			}
 				
 		})
@@ -466,12 +456,12 @@ function regist(playerid,password,nickname){
 		})
 }
 
-function selectTable(){
+function selectTable(player){
 	var url="/game1?action=enterhall&hallid=g24p"
 		$.post(url,
 			{},
 			function(json){
-				//log(json)
+				log(json)
 				var djson=JSON.parse(json);
 				if(djson.returncode!=0){
 					message("EnterHall Error:"+djson.errormessage)
@@ -481,7 +471,7 @@ function selectTable(){
 				var top=100;
 				$(".Table").remove()
 				var hallinfo=djson["hallinfo"]
-				log(hallinfo)
+				//log(hallinfo)
 				for(var t in hallinfo["tables"]){
 					var tableinfo=hallinfo["tables"][t];
 					var tablehtml='<div id='+t+' class=Table title='+t+'>'
@@ -508,6 +498,8 @@ function selectTable(){
 				$('#Game24Hall .Table').click(function(e){
 						var tableid=$(this).attr("id");
 						G24P.table=g24pTable.createNew("g24p",tableid,2)
+						G24P.table.isOnline=true;
+						G24P.table.enter(player)
 						G24P.table.clientInit()
 					})
 			
@@ -526,6 +518,7 @@ function saveConfig(){
 }
 
 
+
 function loadConfig(){
 	var data={};
 	if(localStorage.getItem("G24P")){
@@ -537,50 +530,35 @@ function loadConfig(){
 
 	$(".LoginUI #playerid").attr("value",data["playerid"]);
 
-	G24P.isOnline=data.isonline
 	G24P.bSpeaker=data.speaker
-	if(G24P.isOnline){
+	if(data.isonline){
 		$(".Offline").hide();
 	}else{
 		$(".Offline").show();
 	}
-	if(G24P.bSpeaker){
+	if(data.speaker){
 		$(".SpeakerOff").hide();
 	}else{
 		$(".SpeakerOff").show();
 	}
 	
-	if(G24P.isOnline){
+	if(data.isonline){
 		g24pDisplay("login");
 	}else{
 		if(!!G24P.table)
-			if(G24P.table.intable)G24P.table.leave2(null)
-			
-		var djson={"tablesize": 2, 
-				"tabletype": "g24p",
-				"tableid": "3", 
-				"owner": "heguofeng@189.cn",
-				"players": {"baba": {"nickname": "爸爸", 
-												"playerid": "baba",
-												"wealth": "100"},
-							"baobao": {"nickname": "宝宝", 
-												"playerid": "baobao",
-												"wealth": "100"}
-							}
-			}
-		G24P.player=g24pPlayer.load(djson["players"]["baobao"]);
-		G24P.table=g24pTable.loadPlayers(djson)
-		//G24P.player。intable(G24P.table)
-		G24P.table.isOnline=false;
-		G24P.table.setStage("intable")
+			if(G24P.table.intable)G24P.table.leave2()
 		
+		var td={"tablesize": 2, 
+				"tabletype": "g24p",
+				"tableid": "3" }
+		G24P.table=g24pTable.createNew(td.tabletype,td.tableid,td.tablesize);
+		G24P.table.offline();		
 	}
-	//g24pDisplay();
 }
 
 function Start(entity){
 	log(entity)
-	if(entity==G24P.player.getHtmlId()){
+	if(entity==G24P.table.players.getPlayer(G24P.table.selfid).getHtmlId()){
 		$('#TimeRemain').css({"left":"88%","top":"70%"})
 	}else{
 		$('#TimeRemain').css({"left":"3%","top":"15%"})
@@ -661,8 +639,9 @@ $(document)
 				})
 
 window.onunload = window.onbeforeunload = function(e) {
-	if(G24P.isOnline){
-		G24P.table.leave2(null);
+	if(G24P.table.isOnline){
+		G24P.table.gamequit=true;
+		G24P.table.leave2();
 	}
 	saveConfig();	
 };
@@ -686,7 +665,7 @@ function g24pCal(cards,operator){
 				c= a/b
 				break;
 		}
-		log(c)
+		//log(c)
 		return c
 	}
 	return null
@@ -725,7 +704,7 @@ var g24pTable={
 	createNew:function(type,name,size){
 		var table=SSETable.createNew(type,name,size);
 		table.isComplete=false;
-		table.isOnline=G24P.isOnline;
+		//table.isOnline=G24P.isOnline;
 		table.stage="";
 		table.display=g24pDisplay
 		
@@ -742,6 +721,27 @@ var g24pTable={
 		}
 		
 		table.reinit();
+		
+		table.offline=function(){
+			var td={"tablesize": 2, 
+					"tabletype": "g24p",
+					"tableid": "3", 
+					"owner": "heguofeng@189.cn",
+					"players": {"baba": {"nickname": "爸爸", 
+													"playerid": "baba",
+													"wealth": "100"},
+								"baobao": {"nickname": "宝宝", 
+													"playerid": "baobao",
+													"wealth": "100"}
+								}
+				}
+			table.loadPlayers(td);
+			table.isOnline=false;
+			table.selfid=table.players[0].id;
+			
+			table.setStage("intable")
+			return table;			
+		}
 		
 		table.onlineAction=function(action,data){
 			switch(action){
@@ -769,7 +769,8 @@ var g24pTable={
 				table.broadcast({"redo":data})
 				break;	
 			case "auto":
-				table.broadcast({"answer":table.autoPlay()})
+				table.broadcast({"auto":data})
+				//table.broadcast({"answer":table.autoPlay()})
 				break;	
 			case "sender":
 				break;
@@ -877,8 +878,8 @@ var g24pTable={
 				}
 				break;
 			case "onopen":
-				$(".log").text(G24P.player.id);
-				table.enter(G24P.player,"",table.info)
+				$(".log").text(G24P.table.selfid);
+				table.enter(table.players.getPlayer(table.selfid))
 				break;
 			case "cards":
 				table.reinit();
@@ -927,8 +928,8 @@ var g24pTable={
 			switch(table.stage){
 			case "intable":
 				table.reinit();
-				for(var p in table.players){
-					table.players[p].inTurn=true;
+				for(var i=0;i<table.players.length;i++){
+					table.players[i].inTurn=true;
 				}
 				break;
 			case "racing":
@@ -970,7 +971,7 @@ var g24pTable={
 			}
 			table.master=td.owner;
 			//删除没有的player
-			for( var i=0;i<table.players.length;i++){
+			for( var i=table.players.length-1;i>-1;i--){
 				if(td.players[table.players[i].id]==undefined){
 					table.players.splice(i,1)
 					changed=true
@@ -1002,7 +1003,7 @@ var g24pTable={
 			return changed
 		}
 		
-		table.enterCallback=function(data){
+		table.enterCallback=function(data,status){
 			if(data=="")return;
 			//log("table.enterCallback:"+data)
 			var djson=JSON.parse(data);
@@ -1016,6 +1017,14 @@ var g24pTable={
 				log("something changed!")
 				table.display(table.stage)
 			}
+		}
+		
+		
+		table.leaveCallback=function(data){
+			clearTimeout(g24pTimer);
+			if(G24P.table.gamequit)return;
+			message("离线！改为单机游戏。")
+			table.offline();
 		}
 		
 		table.setDisplay=function(displayfunc){
@@ -1082,7 +1091,7 @@ var g24pTable={
 		}
 		
 		table.stopPlay=function(){
-			var player=G24P.player
+			var player=G24P.table.players.getPlayer(G24P.table.selfid)
 			if(!table.isOnline){
 				player=table.players.getPlayerByHtmlId(table.racer)
 			}
@@ -1109,15 +1118,13 @@ var g24pTable={
 		return table;
 	},
 
-	loadPlayers:function(td){
+/*	load:function(td){
 		var table=g24pTable.createNew(td.tabletype,td.tableid,td.tablesize);
-		table.selfid=G24P.player.id;
-		table.players.push(G24P.player)
-		G24P.player.intable(table)	
 		table.loadPlayers(td)
+		table.selfid=table.players[0].id
 		return table;
-	},
-
+	},*/
+	
 }
 
 function onresize(){
@@ -1139,223 +1146,3 @@ function onresize(){
 	//alert(G24P.Scale+" "+bw+" "+bh)
 }
 
-/*
-function onevent(event,data){
-	switch (event) {
-	case ('onopen'):
-		$(".log").text(G24P.player.id);
-		G24P.table.enter(G24P.player,inTableCallback,G24P.table.info)
-		break
-	case("onchatconnect"):
-		chatconnect(data);
-		//should invoke get players 
-		break;
-	case("onchatdata"):
-		chatdata(data);
-		break;
-	case("onchatclose"):
-		chatclose(data);
-		break;
-	case("onfileconnect"):
-		//fileconnect(data);
-		break;
-
-	default:
-		log(event+" didnt processed!")
-		break
-	}
-}*/
-
-/*
-function intable(tableid){
-	var url="http://127.0.0.1:5000/game1?action=intable&tableid="+tableid
-	log(G24P.player.id)
-	$.post(url,
-		G24P.player.toDict(),
-		function(json){
-			log(json)
-			var djson=JSON.parse(json);
-			if(djson.returncode==0){
-				G24P.table=g24pTable.loadPlayers(djson.tableinfo)
-				G24P.table.setStage("intable")
-				g24pDisplay(G24P.table.stage);
-			}		
-		})
-	
-}
-*/
-
-/*
- * data={"data":data,"c":c}
- * data.data is json {"name":value}
- * 
- * action:point0...point3  when auction
- * hand:{P1:...}       when play
- * cards:{P1:... ,P2:... P3:.. LO:...}  when deal
- * message:"hello"
- * sender:mynickname
- * senderid: just for repeat or lost
- */
-/*
-function chatdata(data) {
-	$(".log").text(data);
-	var r=JSON.parse(data.data)
-	log(r.sender)
-	for( d in r){
-		switch(d) {
-		case("enter"):
-			G24P.table.info();
-			message(r[d]+"进入房间");
-			break;
-		case("cards"):
-		case("unselected"):
-		case("selected"):
-		case("playerraced"):
-		case("operator"):
-		case("answer"):
-			G24P.table.onevent(d,r[d])
-			break;
-		case("tableinfo"):
-			refreshTable(r[d])
-			break;
-		case("msg"):
-		case("message"):
-			message(r[d])
-			break;
-		
-		case("leave"):
-			log(r.d)
-			message(r[d]+"离开房间");
-			G24P.table.info();
-			break;
-		default:
-			log(d +" didnt processed!")
-			break
-		}
-	}
-}
-*/
-
-/*
- * function inTableCallback(data){
-	if(data=="")return;
-	//log("inTableCallBack:"+data)
-	var djson=JSON.parse(data);
-	if(djson.returncode!=0){
-		message("inTable Error!"+djson.errormessage)
-		return
-	}
-	var tableinfo=djson.tableinfo;
-	G24P.table.master=tableinfo.owner;
-	if((G24P.table.stage!="racing")&&(G24P.table.stage!="playing")){
-		G24P.table.setStage("intable")
-	}
-	G24P.table.intable=true;
-	
-	$(".offline").hide();
-	//g24pDisplay(G24P.table.stage)
-	//if(JSON.stringify(Player.players2Dict(G24P.table.players))==JSON.stringify(tableinfo.players))return;
-	if(Player.playersDictEqual(G24P.table.players,tableinfo.players))return
-	
-	if(G24P.table.stage=="playing"){//in game 
-		for(var i=0;i<G24P.table.players.length;i++){
-			if(tableinfo.players[G24P.table.players[i].id]==undefined){
-				if(G24P.table.players[i].type!=1){
-					message(G24P.table.players[i].name+"离线，改为电脑");
-					G24P.table.players[i].name="电脑";
-					G24P.table.players[i].type=1;
-				}
-			}	
-		}
-		//return;  
-	}else{
-		G24P.table.loadPlayers(tableinfo)
-	}
-	g24pDisplay(G24P.table.stage)
-
-}
-*/
-
-/*
-
-function Start(entity){
-	//if(CurrentCards.length==0)return;
-	//if(G24P.playing==false){
-		log(entity)
-		 
-		clearTimeout(G24P.timer)
-		G24P.timeRemain=20.0;
-		if(entity==G24P.player.getHtmlId()){
-			$('#TimeRemain').css({"left":"80%","top":"80%"})
-		}else{
-			$('#TimeRemain').css({"left":"20%","top":"10%"})
-		}
-		//G24P.playing=true;
-		$('#redo').removeClass("Locked");
-		$('#auto').removeClass("Locked");
-		G24P.timer=setInterval(playTimer,100);
-		//G24P.isFinished=false;
-	//}
-}
-
-function playTimer()
-{
-	var c=g24pCal(G24P.table.selectedCards,G24P.table.selectedOperator)
-	if(c!=null){
-		G24P.table.resultCards.addCard(Card.createNew("Result","",c,
-				"T_"+G24P.table.selectedCards[0].sId))
-		log("resultcardid: T_"+G24P.table.selectedCards[0].sId)
-		for(var i=0;i<G24P.table.selectedCards.length;i++){
-			if(G24P.table.selectedCards[i].sSuit=="Result"){
-				G24P.table.resultCards.removeCard(G24P.table.selectedCards[i])
-			}else{
-				G24P.table.playedCards.addCard(G24P.table.selectedCards[i]);
-				G24P.table.cards.removeCard(G24P.table.selectedCards[i])
-			}
-		}
-		if((G24P.table.resultCards.length+G24P.table.cards.length==1)
-				&&(Math.abs(G24P.table.resultCards[0].iPoint-24)<0.01)){
-			//24 complete
-			G24P.table.isComplete=true;
-			Stop()
-		}
-		G24P.table.selectedCards.empty();
-		G24P.table.selectedOperator="";
-		showAllCards();
-	}
-		
-	if(G24P.timeRemain<=0){
-		if(!G24P.table.isComplete)Stop();
-		return;
-	}
-	
-	G24P.timeRemain=G24P.timeRemain-0.1
-	$("#TimeRemain").text(G24P.timeRemain.toFixed(1))
-}
-
-function Stop(){
-	var player=G24P.player
-	if(!G24P.table.isOnline){
-		player=G24P.table.currentPlayer
-	}
-		
-	if(player.getHtmlId()==G24P.table.racer){
-		if(G24P.table.isComplete){
-			message("smart! +10分")
-			player.score+=10;
-		}else{
-			message("时间到!-10分")
-			player.score-=10;
-		}
-		if(G24P.table.isOnline){
-			G24P.table.broadcast({"wealth":player.score})
-		}
-	}
-
-	clearTimeout(G24P.timer);
-	$('#redo').addClass("Locked");
-	$('#auto').addClass("Locked");
-	G24P.timeRemain=0;
-	G24P.table.setStage("intable")
-	
-}*/

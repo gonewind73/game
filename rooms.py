@@ -15,8 +15,9 @@ from threading import Timer
 import time
 import json
 from poke import Deck,Card
-from time import sleep
-from _ctypes import Array
+from get24 import Point24
+#from time import sleep
+
 
 try:
     from config import dprint 
@@ -132,7 +133,6 @@ class Player(object):
         return False
                        
     def update(self,playerdict):
-        changed=False;
         if(self.equal(Player(playerid=playerdict["playerid"],nickname=playerdict["nickname"],
                       playertype=0,wealth=playerdict["wealth"]))):
             return False
@@ -318,7 +318,7 @@ class Table(Players):
         for action in msgdict:
             if(action=="deal"):
                 if(self.deck==None):
-                    self.deck=Deck(1)
+                    self.deck=Deck(1,points=[1,2,3,4,5,6,7,8,9,10,10,10,10,10,10])
                 if(self.deck.getLen()<4):
                     self.deck.deal()
                 cards=self.deck.pickCards(4)
@@ -338,7 +338,12 @@ class Table(Players):
                 else:
                     self.broadcast({"message":"not card to redo!"},sender.playerId)
             elif(action=="auto"):
-                self.broadcast({"message":"not support now!"}, "system")
+                if(self.lastcards!=None):
+                    p24=Point24(self.lastcards.getPoints())
+                    self.broadcast({"answer":p24.run()}, sender.playerId)
+                else:
+                    self.broadcast({"message":"not card to answer!"},sender.playerId)
+                #self.broadcast({"message":"not support now!"}, "system")
                 #self.broadcast({"answer":autoexpr}, "system")
             elif(action=="answer"):
                 self.broadcast({action:msgdict[action]}, sender.playerId)
@@ -416,13 +421,7 @@ class Hall(Players):
               "tables":tables,
             }
         return hallinfo     
-'''    
-    def getPlayer(self,playerid):
-        return self.players.getPlayer(playerid)
-    
-    def addPlayer(self,player):
-        return self.players.addPlayer(player)
-'''
+
 '''
 Game
  post action=registe with form { username=,password=,email=}
@@ -517,15 +516,12 @@ class Game(object):
             playerdict=request.form
             player=table.getPlayer(playerdict["playerid"]);
             if(player==None):
-                #player=Player(playerdict["playerid"],playerdict["nickname"],1,playerdict["wealth"])
                 player=hall.getPlayer(playerdict["playerid"])
             ok,rinfo=table.enter(player)
             
-            dprint("process intable ",rinfo)
+            dprint("process intable ",ok,rinfo)
             if(ok):
                 session["tableid"]=tableid
-                #session["hallid"]=hallid
-                #session["playerid"]=playerid
                 return {"returncode":0,"errormessage":"success!","tableinfo":rinfo},session;
             else:
                 return rinfo,session;
@@ -538,8 +534,6 @@ class Game(object):
             table=hall.getTable(tableid)
             if(table==None):
                 return {"returncode":40001,"errormessage":"table not found!"},session
-            #playerdict=request.form
-            #player=Player(playerdict["playerid"],playerdict["nickname"],1,playerdict["wealth"])
             rinfo=table.getTableInfo()
             dprint("tableinfo ",rinfo)
             return {"returncode":0,"errormessage":"success!","tableinfo":rinfo},session;
@@ -558,9 +552,6 @@ class Game(object):
                 return {"returncode":50001,"errormessage":"player not found!"},session
             
             ok,rinfo=table.leave(player)
-            #session["tableid"]=tableid
-            #session["hallid"]=hallid
-            #session["playerid"]=playerid
             return {"returncode":0,"errormessage":"success!"},session;
         elif(action=="sendmessage"):
             '''
@@ -576,12 +567,7 @@ class Game(object):
             player=table.getPlayer(playerid);
             if(player==None):
                 return {"returncode":50001,"errormessage":"player not found!"},session
-            #todo need process message
             rtmdict=table.processMessage(msgdict,player)
-            #table.broadcast(rtmdict["content"],rtmdict["from"])
-            #session["tableid"]=tableid
-            #session["hallid"]=hallid
-            #session["playerid"]=playerid
             return {"returncode":0,"errormessage":"success!"},session
         elif(action=="getmessage"):
             #todo reget some message
@@ -598,13 +584,9 @@ class Game(object):
         return {"returncode":60001,"errormessage":"unknown action."},session
     
     def getMessage(self,hallid,tableid,playerid):
-        #hallid=session["hallid"]
+       
         hall=self.halls[hallid]
-        #tableid=session["tableid"]
-        #table=hall.getTable(tableid)
-        #playerid=session["playerid"]
         player=hall.getPlayer(playerid)
-        #player=None
         if(player == None):
             #player=hall.getPlayer(playerid)
             #time.sleep(1)

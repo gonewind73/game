@@ -11,9 +11,9 @@ import requests
 import os
 
 
-from rooms import room,rooms,Game
+from rooms import rooms,Game
 from weixinmp import WeixinMp
-from jinja2.runtime import Undefined
+
 
 try:
     from config import dprint 
@@ -293,9 +293,9 @@ def game():
 def gamestream():    
     dprint("gamestream sessions:",flask.session)
     hallid=flask.session["hallid"]
-    tableid=flask.session["tableid"]
+    #tableid=flask.session["tableid"]
     playerid=flask.session["playerid"]
-    return flask.Response(mygame.getMessage(hallid,tableid,playerid), headers={"Access-Control-Allow-Origin": "*"},   
+    return flask.Response(mygame.getMessage(hallid,"",playerid), headers={"Access-Control-Allow-Origin": "*"},   
                           mimetype="text/event-stream")    
 '''    r.call_on_close(on_close)
     return r
@@ -341,18 +341,11 @@ def home():
             </script>    
         
      """ % flask.session['user']    
-   
-
-#@app.route('/mygame/<path:path>')
-#def send_js(path):
-#    return flask.send_from_directory('', path)
 
 @app.route('/mygame/<path:path>')
 def serve_static(path):
     return flask.send_from_directory(os.getcwd(), path)
 
-
-     
 if __name__ == '__main__':    
     app.debug = True 
     app.run(host='0.0.0.0', port=5000, threaded=True)
