@@ -1118,15 +1118,18 @@ function chatclose(c){
 }
 
 /*
- * data={"data":data,"c":c}
- * data.data is json {"name":value}
+ * data={"data":data,"sender":c}
+ * data.data is json {"name:value}
  * 
  * action:point0...point3  when auction
  * hand:{P1:...}       when play
- * cards:{P1:... ,P2:... P3:.. LO:...}  when deal
- * message:"hello"
+ * cards:{P1:... ,P2:... P3:.. LO:...}  when deal 
+ * message:"hello"  ; message 
  * sender:mynickname
  * senderid: just for repeat or lost
+ * enter:  ; new arrive
+ * msg: messagetext ;
+ * table:    ;
  */
 
 function chatdata(data) {

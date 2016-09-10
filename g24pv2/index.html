@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<HTML xmlns="http://www.w3.org/1999/xhtml"
+	class=" canvas canvastext geolocation rgba hsla multiplebgs borderimage borderradius boxshadow opacity cssanimations csscolumns cssgradients cssreflections csstransforms csstransforms3d csstransitions  video audio localstorage sessionstorage webworkers applicationcache fontface">
+<HEAD>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<head>
+<meta charset="UTF-8">
+
+<title>Game 24</title>
+<link href="game24v2.css" rel="stylesheet">
+<script src="../js/jquery-1.4.2.min.js"></script>
+<SCRIPT type="text/javascript" src="../js/zach.min.js"></SCRIPT>
+<SCRIPT type="text/javascript" src="../js/modernizr-1.1.min.js"></SCRIPT>
+
+<script type="text/javascript" src="../js/poke.js"></script>
+<script type="text/javascript" src="game24v2.js"></script>
+</head>
+<body onresize=onresize()>
+	<section id="Game24Hall" class=hall>
+			<div id="0" class=Table>
+			     <div id="0" class=player0></div>
+			     <div id="0" class=player1></div>
+			     <div id="0" class=player2></div>
+			     <div id="0" class=player3></div>
+				<div class=chair0></div>
+				<div class=chair1></div>
+				<div class=chair2></div>
+				<div class=chair3></div>
+			</div>
+	</section>
+	<section id="Game24">
+		<div id=table>
+			<div class=Players>
+				<div id="player1" class="Player P0">
+					<span class="Nickname">player1</span> <span class="Score">0</span>
+				</div>
+				<div id="player2" class="Player P1">
+					<span class="Nickname">player2</span><span class="Score">0</span>
+				</div>
+			</div>
+			<div id="Shoe"></div>
+			<div id="Cards"></div>
+			<div id="Operators">
+				<a href="#" id="Plus" class="Operator " title="+"></a> 
+				<a href="#" id="Minus" class="Operator " title="-"></a>
+				<a href="#" id="Multiple" class="Operator " title="*"></a>
+				<a href="#" id="Divid" class="Operator " title="/"></a>
+			</div>
+		</div>
+
+		<div id="Actions">
+			 <a href="#" id="redo" class="Action Locked" title="重做"></a>
+			 <a href="#" id="auto" class="Action Locked" title="自动解答"></a>
+			 <a href="#" id="help" class="Action" title="帮助"></a>
+		</div>
+		<div id="Message"></div>
+		<div id="TimeRemain">0.0</div>
+		<div class="Help">
+			<p>
+				欢迎使用24点游戏。  游戏规则： <br> <br>
+				本游戏同时支持单机和联机模式。 点击左上角 信号图标切换单机和联机模式。 <br>
+				1、在单机模式下，支持双人单机对玩，宝宝 和 爸爸  分别代表两人 ，联机模式请根据步骤，注册帐号，登录，选择桌子 <br>
+				2、按左上角 扑克图案代表发牌，会显示4张扑克。1-10分别代表各自数字，JQK 大小鬼 花牌点数为10点； <br>
+				3、在出牌后，两位玩家可以思考利用+-×/得到24.如果已经找到方法，可以点击代表自己的图标按钮抢答； <br>
+				4、抢答时间限时为20s，在此期间，可以通过点击两张牌和一个运算符，得到一个新的点数，原来的两个点数会消失， <br>
+				5、余下的3个点数可以再进行选择2个点数和一个运算符，得到一个新的点数，以此类推，以最终得到24为胜 <br>
+				6、如果在20s能完成24点运算，则可以获得10分，如果没有完成，则抢答者会被扣除10分 <br>
+				7、如果在游戏过程中，发现步骤错误，可以点击右下角摇晃的图标(第一个)，恢复抢答时的4张牌，重新开始操作，但时间不延长。 <br>
+				7、本游戏支持小数运算 <br> 8、如果两个玩家都无法做出，可以点击右下角旗帜图标(第二个)，可以看到计算机计算结果。 <br>
+				9、当然一个玩家也可以自娱自乐！ <br> <br> 
+				10、任何改进建议请发邮件给 gonewind08@qq.com <br>
+
+			</p>
+		</div>
+		<div class="Setup">
+		<div class="Speaker"></div><div class="SpeakerOff"></div>
+		<div class="Online"></div><div class="Offline"></div>
+		</div>
+		<div class="LoginUI">
+			<div >账户 <input type="text" id="playerid" placeholder="playerid" value=""></div>
+			<div >密码  <input type="password" id="password" placeholder="****" value=""></div>
+			<div class="Info">请输入账户和密码，点击OK登录</div>
+			<div >
+			 	 <a href="#" id="regist" class="Action">注册</a> 
+			     <a href="#" id="loginOk" class="Action"></a> 
+			     <a href="#" id="loginCancel" class="Action"></a>
+			</div>		
+		</div>
+		<div class="RegistUI">
+			<div >账户 <input type="text" id="playerid" placeholder="please use email" value=""></div>
+			<div >密码  <input type="password" id="password" placeholder="****" value=""></div>
+			<div >密码  <input type="password" id="password2" placeholder="retype" value="" onchange="isSame()"></div>
+			<div >别名  <input type="text" id="nickname" placeholder="nickname" value="" ></div>
+			<div class="Info">请输入账户和密码，点击OK注册</div>
+			<div >
+			     <a href="#" id="registOk" class="Action"></a> 
+			     <a href="#" id="registCancel" class="Action"></a>
+			</div>		
+		</div>
+		<div class="cyr">By 何国锋</div>
+		<div class="log"></div>
+		<div class="Chat">
+            <select id="presetmessage" name="presetmessage">
+                <option value="快点出">快出</option>
+                <option value="等到花儿都谢了">花谢了</option>
+                <option value="这么慢">慢</option>
+                <option value="有事走了">再见</option>
+                </select>
+                <input id="button" type="button" value="发送" onclick="chatmessage()">
+            <input type="text" id="chatmessage" placeholder="what you want to say?" value="">
+        </div>
+		
+	</section>
+</body>
+</html>

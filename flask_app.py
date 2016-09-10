@@ -6,15 +6,22 @@ Created on 2016年7月12日
 #!/usr/bin/env python    
 import datetime    
 import flask 
-#import gevent
-import os.path
 import json
-import hashlib
 import requests
-import xml.etree.ElementTree as ET
+import os
 
-from rooms import room,rooms
+
+from rooms import room,rooms,Game
 from weixinmp import WeixinMp
+from jinja2.runtime import Undefined
+
+try:
+    from config import dprint 
+except:
+    print("No dprint method defined,use default")
+    def dprint(*args):
+        print(*args)
+        
 #use redislite instead 2016.8.20
 try:
     import redislite
@@ -31,7 +38,8 @@ myRooms=rooms(100)
 myIps={};
 wxmp=WeixinMp({'token':"52128431",'appid':"wxd9d30601a109424b",'secret':"c8ed54032e0c7d8b8ba12c917e34af41"})
 
-
+mygame=Game()
+mygame.addHall("DDZ", "DDZhall")
 
 #@app.before_request
 #def make_session_permanent():
@@ -41,10 +49,10 @@ def redismeesge(roomid):
     pubsub = red.pubsub()    
     pubsub.subscribe(roomid)    
     
-    print(roomid);
+    dprint(roomid);
     # TODO: handle client disconnection.    
     for msg in pubsub.listen():    
-        print(msg)  
+        dprint(msg)  
         if (msg["type"]=="message"):
             yield 'data: %s\n\n' % (msg['data'].decode()) 
         else:
@@ -56,13 +64,13 @@ def redis_post():
     froomid=flask.request.form['roomid']
     user = flask.session.get('user', 'anonymous')    
     flask.session['roomid']=froomid;
-    print(message,froomid);
+    dprint(message,froomid);
     red.publish(froomid,message);
     return flask.Response(status=204,headers={"Access-Control-Allow-Origin": "*"}) 
 
 @app.route('/redisstream')    
 def redis_stream():    
-    print(flask.session)
+    dprint(flask.session)
     froom=flask.session.get('roomid','904')
     #froom=flask.request.form['room']
     return flask.Response(redismeesge(froom), headers={"Access-Control-Allow-Origin": "*"},   
@@ -74,17 +82,16 @@ def event_stream(roomid):
     while(True):
         message,index=r.getmessage()
         if(len(message)>0):
-            print("event_stream #1")
+            dprint("event_stream #1")
             yield 'data: %s\n\n' % message  
             #gevent.sleep(0.5)
-            print("event_stream #2 delete")
+            dprint("event_stream #2 delete")
             r.delmessage(index)
             
             
 @app.route('/enter',methods=['GET', 'POST'])    
 def enterroom():    
     if flask.request.method == 'POST':    
-        #print(flask.request)
         froomid=flask.request.form['roomid']
         fnickname=flask.request.form['nickname']
         fpeerid=flask.request.form['peerid']
@@ -93,13 +100,12 @@ def enterroom():
         flask.session['roomid'] =  froomid
         flask.session.permanent = True
       
-        #print(fpeerid)
         
         r,message=myRooms.subscribe(roomid=froomid,user=fnickname,peerid=fpeerid)
         roominfo= myRooms.getroominfo(froomid) 
         data={"result":r,"message":message,"roominfo":roominfo}
         djson=json.dumps(data)
-        #print(data)
+        dprint(data)
         return flask.Response(djson,headers={"Access-Control-Allow-Origin": "*"})
     return '<form action="/enter" method="post">user: <input type=text name="nickname">room: <input type="text" name="roomid">peerid: <input type="text" name="peerid"><input type="submit" value="Submit"></form>'      
  
@@ -111,18 +117,18 @@ def getsession():
 @app.route('/leave',methods=['GET', 'POST'])    
 def leaveroom():    
     if flask.request.method == 'POST':    
-        print(flask.request)
+        dprint(flask.request)
         froomid=flask.request.form['roomid']
         fnickname=flask.request.form['nickname']
         fpeerid=flask.request.form['peerid']
-        print(fpeerid)
+        dprint(fpeerid)
         
         result,message=myRooms.unsubscribe(roomid=froomid,user=fnickname,peerid=fpeerid)
-        print(result,message)
+        dprint(result,message)
         roominfo= myRooms.getroominfo(froomid) 
         data={"result":result,"message":message,"roominfo":roominfo}
         djson=json.dumps(data)
-        print(data)
+        dprint(data)
         return flask.Response(djson,headers={"Access-Control-Allow-Origin": "*"})
     return '<form action="/leave" method="post">user: <input type=text name="nickname">room: <input type="text" name="roomid">peerid: <input type="text" name="peerid"><input type="submit" value="Submit"></form>'      
    
@@ -136,31 +142,31 @@ def postip():
         ip=""
         try:
             ip=flask.request.headers['X-Real-IP'];   #pythonanywhere
-            print("X-Real-IP ",ip)
+            dprint("X-Real-IP ",ip)
         except:
             try:
                 ip=flask.request.headers['x-forwarded-for'];  #openshift
                 ip=ip.split(",")[0]
-                print("x-forwarded-for ",ip)
+                dprint("x-forwarded-for ",ip)
             except:
                 ip=flask.request.remote_addr;
-                print('remote_addr ',ip)
+                dprint('remote_addr ',ip)
         myIps["myRemoteIp"]=ip
-        print("WlanIp = ",myIps["myLocalIp"]," eth0Ip = ",myIps["myeth0Ip"]," 138Ip = ",myIps["myIp138"]," RemoteIp = ",myIps["myRemoteIp"])
+        dprint("WlanIp = ",myIps["myLocalIp"]," eth0Ip = ",myIps["myeth0Ip"]," 138Ip = ",myIps["myIp138"]," RemoteIp = ",myIps["myRemoteIp"])
 
         return flask.redirect('/getip')    
     return '<form action="/postip" method="post">localip: <input type=text name="wlanip">eth0ip: <input type=text name="eth0ip">138ip: <input type=text name="138ip"><input type="submit" value="Submit"></form>'    
 
 @app.route('/getip')    
 def getip():    
-    print(myIps["myLocalIp"])
-    print(myIps["myRemoteIp"])
+    dprint(myIps["myLocalIp"])
+    dprint(myIps["myRemoteIp"])
     return 'Wlan0lIp =' +myIps["myLocalIp"]+'Eth0lIp =' +myIps["myeth0Ip"]+"  138Ip = "+myIps["myIp138"]+"  RemoteIp = "+myIps["myRemoteIp"];
 
 @app.route('/doudizhu')    
 def doudizhuurl():        
-    print(myIps["myLocalIp"])
-    print(myIps["myRemoteIp"])
+    dprint(myIps["myLocalIp"])
+    dprint(myIps["myRemoteIp"])
     redirecturl="http://"+myIps["myRemoteIp"]+":5000/mygame/doudizhu/index.html"
     #return flask.redirect(redirecturl, code=302)
     return "<html><head><title>斗地主</title><meta charset='UTF-8'></head>" \
@@ -168,8 +174,37 @@ def doudizhuurl():
 
 @app.route('/doudizhu1')    
 def doudizhuurl1():        
-    print(os.getcwd())
+    dprint(os.getcwd())
     return flask.render_template('doudizhu.html', hostip=myIps["myRemoteIp"])
+
+
+@app.route('/game24')
+def game24url():
+    print(myIps["myLocalIp"])
+    print(myIps["myRemoteIp"])
+    if(myIps["myRemoteIp"]==None):
+        return "error in register server ip!"
+    redirecturl="http://"+myIps["myRemoteIp"]+":5000/mygame/g24pv2/index.html"
+    #return flask.redirect(redirecturl code=302)
+    script='''
+    <script src="/game/js/jquery-1.4.2.min.js"></script>
+    <script language='javascript'>
+    function onresize1(){
+            var bw=screen.width;
+            var bh=screen.height;
+            if(bw<bh){
+                $('iframe').width('1000px');
+                $('iframe').height('1500px');
+            }else{
+                $('iframe').width('1000px');
+                $('iframe').height('500px');
+            }
+    }</script>
+    '''
+
+    return "<html><head><title>算24</title><meta charset='UTF-8'></head>"\
+            +script \
+            +"<body leftmargin='0' topmargin='0' onresize='onresize1()'><iframe src='"+redirecturl+"' width='100%' height='100%' frameborder='0'></iframe></body></html>"
 
 
 @app.route('/getselfip')    
@@ -193,9 +228,9 @@ def weixin():
 @app.route('/weixin1',methods=['GET'])
 def weixin1():
     fullpath=flask.request.fullpath;
-    print("fullpath: ",fullpath)
+    dprint("fullpath: ",fullpath)
     r=requests.get("http://"+myIps["myRemoteIp"]+":5000/weixin2"+fullpath)
-    print("return: ",r.text)
+    dprint("return: ",r.text)
     return r.text;
 
  
@@ -206,7 +241,7 @@ def login():
         fuser=flask.request.form['nickname']
         flask.session['user'] =  fuser 
         flask.session['roomid'] =  froomid
-        #print(flask.session)
+        dprint(flask.session)
         myRooms.subscribe(roomid=froomid,user=fuser,peerid="1")
         return flask.redirect('/')    
     return '<form action="/login" method="post">user: <input type=text name="nickname">room: <input type="text" name="roomid"><input type="submit" value="Submit"></form>'    
@@ -223,12 +258,12 @@ def post():
     message=message.join((now," ",fuser,":",fmessage))
     
     r.publish(message)
-    print(r.getmessage()) 
+    dprint(r.getmessage()) 
     return flask.Response(status=204)    
  
 @app.route('/stream')    
 def stream():    
-    print(flask.session)
+    dprint(flask.session)
     froom=flask.session.get('roomid','chat')
 
     return flask.Response(event_stream(froom),    
@@ -244,7 +279,32 @@ def opendoor():
         return "open"
     else:
         return "not support!"
+
+@app.route('/game1',methods=['GET', 'POST'])    
+def game():    
+    rtn,session=mygame.process(flask.request,flask.session) 
+    flask.session=session
+    dprint("game sessions:",flask.session)
+    djson=json.dumps(rtn)
+    dprint(djson)
+    return flask.Response(djson,headers={"Access-Control-Allow-Origin": "*"})
+
+@app.route('/gamestream')    
+def gamestream():    
+    dprint("gamestream sessions:",flask.session)
+    hallid=flask.session["hallid"]
+    tableid=flask.session["tableid"]
+    playerid=flask.session["playerid"]
+    return flask.Response(mygame.getMessage(hallid,tableid,playerid), headers={"Access-Control-Allow-Origin": "*"},   
+                          mimetype="text/event-stream")    
+'''    r.call_on_close(on_close)
+    return r
  
+def on_close():
+    dprint("sse response is closed!")
+
+'''
+        
 @app.route('/')    
 def home():    
     if 'user' not in flask.session:    
@@ -289,13 +349,10 @@ def home():
 
 @app.route('/mygame/<path:path>')
 def serve_static(path):
-    #root_dir = os.getcwd()
-    #p=os.path.join(root_dir)
-    #print(p)
     return flask.send_from_directory(os.getcwd(), path)
 
 
      
 if __name__ == '__main__':    
-    app.debug = True    
+    app.debug = True 
     app.run(host='0.0.0.0', port=5000, threaded=True)

@@ -1,0 +1,843 @@
+@CHARSET "UTF-8";
+
+
+html,body{
+	margin:0px;	
+	padding:0px;
+	color:#FFF;
+	background-color: #000;
+	background-image: url(../img/Floor.jpg);
+	background-repeat:repeat;
+	background-position:top center;
+	background-attachment:scroll;
+	min-width:1000px;
+	min-height:500px;
+	width:100%;
+	height:100%;
+	z-index:-1;
+	overflow:hidden;
+}
+
+#Game24 {
+    margin: auto;
+    position:relative;
+    width: 100%;
+    height: 100%;
+}
+
+body,td,th {
+	font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+	font-size: 14px;
+}
+a, a:link, a:visited{
+	color:#FFF;
+	text-decoration:none;
+}
+
+.hall{
+	/*background-image: url(../img/Black_Alpha25.png);*/
+	background-repeat:repeat;
+	position:absolute;
+	width:1000px;
+	height:600px;
+	z-index:0;
+}
+
+.Table{
+	background-image: url(../img/table2.png);
+	background-repeat:repeat;
+	top:200px;
+	left:200px;
+	width:120px;
+	height:120px;
+	position:absolute;
+	z-index:10;
+}
+
+.Table .player0{
+	background-image: url(../img/nongmin.bmp);
+	position:absolute;
+	top:-15px;
+	left:-115px;
+	width:131px;
+	height:142px;
+	z-index:20;
+	transform:scale(0.5,0.5) rotate(90deg);
+}
+
+.Table .player1{
+    background-image: url(../img/nongmin.bmp);
+    position:absolute;
+    top:-15px;
+    left:100px;
+    width:131px;
+    height:142px;
+    z-index:20;
+    transform:scale(0.5,0.5) rotate(-90deg);
+}
+
+.Table .player2{
+    background-image: url(../img/nongmin.bmp);
+    position:absolute;
+    top:-105px;
+    left:0px;
+    width:131px;
+    height:142px;
+    z-index:20;
+    transform:scale(0.5,0.5) rotate(180deg);
+}
+
+.Table .player3{
+    background-image: url(../img/nongmin.bmp);
+    position:absolute;
+    top:85px;
+    left:0px;
+    width:131px;
+    height:142px;
+    z-index:20;
+    transform:scale(0.5,0.5) rotate(0deg);
+}
+
+.Table .chair0{
+	background-image: url(../img/chair2.png);
+	position:absolute;
+	top:30px;
+	left:-70px;
+	width:60px;
+	height:60px;
+	z-index:20;
+	transform: rotate(0deg);
+}
+
+.Table .chair1{
+	background-image: url(../img/chair2.png);
+	position:absolute;
+	top:30px;
+	left:130px;
+	width:60px;
+	height:60px;
+	z-index:20;
+	transform: rotate(180deg);
+}
+
+.Table .chair2{
+	background-image: url(../img/chair2.png);
+	position:absolute;
+	top:130px;
+	left:30px;
+	width:60px;
+	height:60px;
+	z-index:20;
+	transform: rotate(-90deg);
+}
+
+.Table .chair3{
+	background-image: url(../img/chair2.png);
+	position:absolute;
+	top:-70px;
+	left:30px;
+	width:60px;
+	height:60px;
+	z-index:20;
+	transform: rotate(90deg);
+}
+
+#Shoe, #Discard, #Dealer, #Player {
+	position:absolute;
+	width:69px;
+	height:100px;
+	border:#FFF 1px solid;
+	-webkit-border-radius:6px;
+	-moz-border-radius:6px;
+	background-position:center center;
+	background-repeat:no-repeat;
+}
+
+.Setup{
+	position:absolute;
+    left:50%;
+    top:0px;
+ 
+}
+
+.Setup .Speaker{
+	position:absolute;
+	background-image:url(../img/speaker.png);
+    left:0px;
+    top:-60px;
+    width:200px;
+    height:200px;
+    -moz-box-shadow:0px 5px 5px #000;
+    -webkit-box-shadow:0px 5px 5px #000;
+    transform:scale(0.25);
+}
+
+.Setup .SpeakerOff{
+    position:absolute;
+    background-image:url(../img/off.png);
+    left:0px;
+    top:-60px;
+    width:200px;
+    height:200px;
+    transform:scale(0.1);
+}
+.Setup .Online{
+    position:absolute;
+    background-image:url(../img/online.png);
+    left:100px;
+    top:-60px;
+    width:200px;
+    height:200px;
+    -moz-box-shadow:0px 5px 5px #000;
+    -webkit-box-shadow:0px 5px 5px #000;
+    transform:scale(0.25);
+}
+
+.Setup .Offline{
+    position:absolute;
+    background-image:url(../img/off.png);
+    left:100px;
+    top:-60px;
+    width:200px;
+    height:200px;
+    transform:scale(0.1);
+}
+
+#Shoe{
+	background-image:url(../img/Shoe.png);
+	left:50%;
+	top:20px;
+	margin-left:350px;
+	-moz-box-shadow:0px 5px 5px #000;
+	-webkit-box-shadow:0px 5px 5px #000;
+}
+
+#Shoe .Card{
+	position:absolute;
+	left:-1px;
+	top:-1px;
+}
+
+#Deck{
+	background-image:url(../img/Stack.gif);	
+	-moz-border-radius-topleft:6px;
+	-moz-border-radius-topright:6px;
+	-webkit-border-top-left-radius:6px;
+	-webkit-border-top-right-radius:6px;
+}
+
+#Operators{
+	position:absolute;
+	left:30%;
+	top:65%;
+	width:400px;
+	height:60px;
+	margin-left:10px;
+	margin-top:0px;
+}
+
+.Operator{
+	position:absolute;
+	
+	width:60px;
+	height:60px;
+	
+	-moz-border-radius:30px;
+	-webkit-border-radius:30px;
+	
+	display:block;
+	background-image:url(../img/Operators.png);
+	transform:scale(1.2,1.2)
+}
+
+.Operator.selected{
+	transform:scale(1.5,1.5)
+}
+
+.Operator#Plus{
+	background-position:-15px -15px;
+}
+
+.Operator#Minus{
+	background-position:-106px -15px;
+	left:125px;
+	top:0px;
+}
+
+.Operator#Multiple{
+	background-position:-198px -15px;
+	left:250px;
+	top:0px;
+}
+
+.Operator#Divid{
+	background-position:-290px -15px;
+	left:375px;
+	top:0px;
+}
+
+#Actions{
+	position:absolute;
+	left:10%;
+	top:80%;
+	width:400px;
+	height:60px;
+	margin-left:10px;
+	margin-top:0px;
+}
+
+.Action{
+	position:absolute;
+	width:60px;
+	height:60px;
+	
+	-moz-border-radius:30px;
+	-webkit-border-radius:30px;
+	display:block;
+}
+
+.Action#next{
+	background-image:url(../img/Actions.png);
+	background-position:0px 0px;
+}
+
+.Action#redo{
+	background-image:url(../img/Actions.png);
+	background-position:-120px 0px;
+	left:100px;
+	top:0px;
+}
+
+.Action#auto{
+	background-image:url(../img/Actions.png);
+	background-position:-240px 0px;
+	left:200px;
+	top:0px;
+}
+
+.Action#help{
+	position:absolute;
+	background-image:url(../img/help.jpg);
+	background-position:0px 0px;
+	width:60px;
+	height:60px;
+	-moz-border-radius:30px;
+	-webkit-border-radius:30px;
+	left:300px;
+	top:0px;
+	transform:scale(0.8,0.8)
+}
+
+
+.cyr {
+	position:absolute;
+	text-align:center;
+	margin-top:0px;
+	left:50%;
+	top:95%;
+	
+	}
+
+#Cards{
+	position:absolute;	
+	z-index:15;
+	left:15%;
+	top:25%;
+	margin-left:10px;
+	margin-top:0px;
+	width:400px;
+	height:100px;
+	
+}
+
+.Card{
+	width:68.5px;
+	height:99px;
+	display:block;
+	position:absolute;
+	
+}
+
+.Card.selected{
+    transform:scale(1.5,1.5)
+}
+
+span {
+	 
+	  vertical-align: middle;
+}
+	
+.CardT{
+	position:absolute;
+	left: 0px; 
+	top:  0px;  
+
+    width:68.5px;
+    height:99px;
+	margin-left: 0px; 
+	margin-top:  0px;
+	text-align:center;
+	vertical-align: middle;
+	font-size:60px;
+	border:2px #FFF solid;
+	background-image:url(../img/Black_Alpha25.png);
+	-moz-border-radius:24px;
+	-webkit-border-radius:24px;
+	-moz-box-shadow:0px 5px 5px #000;
+	-webkit-box-shadow:0px 5px 5px #000;
+}
+
+#Card1{
+	top:0px;
+	left:0px;
+	
+}
+
+#Card2{
+	top:0px;
+	left:200px;
+	
+}
+
+
+
+.Front, .Back{
+	width:100%;
+	height:100%;
+	position:absolute;
+	background-color:#FFF;
+	-moz-box-shadow:0px 5px 5px #000;
+	-webkit-box-shadow:0px 5px 5px #000;
+}
+.Front{
+	background-image:url(../img/Back.png);
+	
+}
+
+.Back{
+		
+}
+
+.Clubs{
+	background-image:url(../img/Clubs.png);
+	
+}
+.Diamonds{
+	background-image:url(../img/Diamonds.png);
+	
+}
+.Hearts{
+	background-image:url(../img/Hearts.png);
+	
+}
+.Spades{
+	background-image:url(../img/Spades.png);
+	
+}
+
+.Result{
+    background-image:url(../img/Black_Alpha25.png);
+}
+
+.Ace{
+	background-position:-0px 0px;
+	
+}
+.Two{
+	background-position:-138px 0px;
+}
+.Three{
+	background-position:-276px 0px;
+	
+}
+.Four{
+	background-position:-414px 0px;
+	
+}
+.Five{
+	background-position:-552px 0px;
+	
+}
+.Six{
+	background-position:-690px 0px;
+	
+}
+.Seven{
+	background-position:-827px 0px;
+	
+}
+.Eight{
+	background-position:-965px 0px;
+	
+}
+.Nine{
+	background-position:-1103px 0px;
+	
+}
+.Ten{
+	background-position:-1241px 0px;
+	
+}
+.Jack{
+	background-position:-1378px 0px;
+	
+}
+.Queen{
+	background-position:-1516px 0px;
+	
+}
+.King{
+	background-position:-1654px 0px;
+	
+}
+
+.LittleJoker {
+    background-image: url(../img/jokers1.png);
+    background-position: -133px 0px;
+}
+
+.BigJoker {
+    background-image: url(../img/jokers1.png);
+    background-position: 0px 0px;
+}
+
+.Locked{
+	opacity:0.25;	
+}
+
+
+#Message{
+	display:none;
+	width:400px;
+	height:100px;
+	position:absolute;
+	left:50%;
+	top:50%;
+	margin-left:-200px;
+	margin-top:-100px;
+	padding-top:50px;
+	font-size:48px;
+	text-align:center;
+	vertical-align:middle;
+	color:#FFF;
+	border:medium solid #FFF;
+	-webkit-border-radius:100px;
+	-moz-border-radius:100px;
+	z-index:100;
+	background-image:url(../img/Black_Alpha25.png);
+	-moz-box-shadow:0px 5px 5px #000;
+	-webkit-box-shadow:0px 5px 5px #000;
+}
+
+#Table {
+	background-attachment:scroll;
+	background-image: url(../img/Table.png);
+	background-repeat: no-repeat;
+	background-position: top center;
+	height: 500px;
+	width: 100%;
+	overflow: visible;
+	position: absolute;
+	z-index:0;
+}
+
+.Score{
+	border:1px #FFF solid;
+	
+	-moz-border-radius:18px;
+	-webkit-border-radius:18px;
+	padding:2px;
+	min-width:14px;
+	
+	
+	top:112px;
+	left:25px;
+	font-size:20px;
+	text-align:center;
+}
+
+.Player{
+	background-image:url(../img/Black_Alpha25.png);
+	position:absolute;
+	width:250px;
+	height:60px;
+	font-size:42px;
+	left:50%;
+	top:475px;
+	margin-left:-100px;
+	text-align:center;
+	
+	border:2px #FFF solid;
+	
+	-moz-border-radius:24px;
+	-webkit-border-radius:24px;
+	-moz-box-shadow:0px 5px 5px #000;
+	-webkit-box-shadow:0px 5px 5px #000;
+}
+
+.Player.selected{
+	background-image:url(../img/Red_Alpha25.png);
+}
+
+.Player.P0{
+	left:12%;
+	top:2%;
+	transform:rotate(180deg)
+}
+
+.Player.P1{
+	left:82%;
+	top:80%;
+}
+
+#TimeRemain {
+    position: absolute;
+    left: 45%;
+    top: 15px;
+    width: 80px;
+    height: 40px;
+    margin-top: 0px;
+    font-size: 32px;
+    opacity: 0.75;
+    text-align: center;
+    overflow: visible;
+    text-shadow: 0px 5px #000;
+    border: 4px #EEE solid;
+    -moz-border-radius: 16px;
+    -webkit-border-radius: 16px;
+    -moz-box-shadow: 0px 5px 5px #000;
+    -webkit-box-shadow: 0px 5px 5px #000;
+    background-color:red;
+}
+
+.log {
+    position: absolute;
+    text-align: center;
+    margin-top: 0px;
+    left: 50%;
+    top: 97%;
+}
+
+.Chat {
+    position: absolute;
+    text-align: left;
+    margin: 10px auto;
+    margin-top: 30px;
+    left: 30%;
+    top: 10%;
+    width: 190px;
+    height: 40px;
+    background-image: url(../img/Black_Alpha25.png);
+    font-size: 30px;
+    margin-left: 0px;
+    text-align: left;
+    border: 1px #FFF solid;
+    padding: 20px 15px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-box-shadow: 0px 5px 5px #000;
+    -webkit-box-shadow: 0px 5px 5px #000;
+    z-index: 20;
+}
+
+.Chat select{
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    font-size: 20px;
+}
+
+.Chat #button{
+    position: absolute;
+    left: 150px;
+    top: 10px;
+    font-size: 20px;
+}
+
+.Chat #chatmessage{
+    position: absolute;
+    left: 10px;
+    top: 40px;
+    width:195px;
+}
+
+
+.Help {
+	position:absolute;
+	text-align:left;
+	margin-top:0px;
+	left:20%;
+	top:20%;
+	width:60%;
+	height:60%;
+	background-image:url(../img/Black_Alpha25.png);
+	
+	}
+
+.LoginUI{
+	position: absolute;
+	text-align: left;
+	left: 35%;
+	top: 20%;
+	width: 300px;
+	height: 200px;
+	background-image: url(../img/Black_Alpha25.png);
+	font-size: 40px;
+	margin: 110px auto;
+	margin-top: 30px;
+	margin-left: 0px;
+
+	border: 1px #FFF solid;
+	padding: 20px 20px;
+	-moz-border-radius: 24px;
+	-webkit-border-radius: 24px;
+	-moz-box-shadow: 0px 5px 5px #000;
+	-webkit-box-shadow: 0px 5px 5px #000;
+	z-index: 20;
+}
+
+.LoginUI .Action#regist {
+	position: absolute;
+	left: 20px;
+	top: 180px;
+	font-size:30px;
+	color:red;
+}
+
+.LoginUI .Action#loginOk {
+	position: absolute;
+	background-image: url(../img/ok.jpg);
+	background-position: 0px 0px;
+	width: 60px;
+	height: 60px;
+	-moz-border-radius: 30px;
+	-webkit-border-radius: 30px;
+	left: 100px;
+	top: 150px;
+}
+
+.LoginUI .Action#loginCancel {
+	position: absolute;
+	background-image: url(../img/cancel.jpg);
+	background-position: 0px 0px;
+	width: 60px;
+	height: 60px;
+	-moz-border-radius: 30px;
+	-webkit-border-radius: 30px;
+	left: 200px;
+	top: 150px;
+}
+
+.LoginUI #playerid{
+	position: absolute;
+	left: 110px;
+	top: 20px;
+	width:195px;
+	font-size: 30px;
+}
+
+.LoginUI #password{
+	position: absolute;
+	left: 110px;
+	top: 70px;
+	width:195px;
+	font-size: 30px;
+}
+
+.LoginUI .Info{
+	position: absolute;
+	left: 30px;
+	top: 120px;
+	width:250px;
+	font-size: 10px;
+	color:red;
+	
+}
+
+.RegistUI{
+	position: absolute;
+	text-align: left;
+	left: 35%;
+	top: 20%;
+	width: 300px;
+	height: 300px;
+	background-image: url(../img/Black_Alpha25.png);
+	font-size: 40px;
+	margin: 110px auto;
+	margin-top: 30px;
+	margin-left: 0px;
+
+	border: 1px #FFF solid;
+	padding: 20px 20px;
+	-moz-border-radius: 24px;
+	-webkit-border-radius: 24px;
+	-moz-box-shadow: 0px 5px 5px #000;
+	-webkit-box-shadow: 0px 5px 5px #000;
+	z-index: 20;
+}
+.RegistUI .Action#registOk {
+	position: absolute;
+	background-image: url(../img/ok.jpg);
+	background-position: 0px 0px;
+	width: 60px;
+	height: 60px;
+	-moz-border-radius: 30px;
+	-webkit-border-radius: 30px;
+	left: 100px;
+	top: 250px;
+}
+
+.RegistUI .Action#registCancel {
+	position: absolute;
+	background-image: url(../img/cancel.jpg);
+	background-position: 0px 0px;
+	width: 60px;
+	height: 60px;
+	-moz-border-radius: 30px;
+	-webkit-border-radius: 30px;
+	left: 200px;
+	top: 250px;
+}
+
+.RegistUI #playerid{
+	position: absolute;
+	left: 110px;
+	top: 20px;
+	width:195px;
+	font-size: 30px;
+}
+
+.RegistUI #password{
+	position: absolute;
+	left: 110px;
+	top: 70px;
+	width:195px;
+	font-size: 30px;
+}
+
+.RegistUI #password2{
+	position: absolute;
+	left: 110px;
+	top: 120px;
+	width:195px;
+	font-size: 30px;
+}
+
+.RegistUI #nickname{
+	position: absolute;
+	left: 110px;
+	top: 170px;
+	width:195px;
+	font-size: 30px;
+}
+
+.RegistUI .Info{
+	position: absolute;
+	left: 30px;
+	top: 220px;
+	width:250px;
+	font-size: 10px;
+	color:red;
+	
+}
+
