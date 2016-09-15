@@ -33,10 +33,24 @@ try:
 except:
     dprint("no redislite,using redis!")
     import redis
-    red = redis.StrictRedis(host='localhost', port=6379, db=6)  
+    redishost='localhost'
+    redisport=6379
+    redispassword=''
+    import os
+    if 'OPENSHIFT_REDIS_HOST' in os.environ:
+        dprint("on openshift redis!")
+        redishost=os.environ['OPENSHIFT_REDIS_HOST']
+        redisport=os.environ['OPENSHIFT_REDIS_PORT']
+        redispassword=os.environ['REDIS_PASSWORD']
+    red = redis.StrictRedis(host=redishost, port=redisport, password=redispassword,db=6)  
+    #red = redis.StrictRedis(host='localhost', port=6379, db=6)  
     
-heartbeattime=30
+heartbeattime=60
 
+'''
+["playerid","nickname","wealth","password"]
+{"playerid":"hgf","nickname":"baba","wealth":100,"password":1}
+'''
 
 class DB(object):
     def __init__(self):
@@ -80,7 +94,7 @@ class DB(object):
                       playertype=0,wealth=playerdict["wealth"])
 
 class Player(object):
-    HEART_BEAT=30
+    HEART_BEAT=60
     def __init__(self,playerid,nickname="",playertype=0,wealth=100):
         self.playerId=playerid
         if(nickname==""):
@@ -103,15 +117,15 @@ class Player(object):
     def startBeat(self):
         self.heartBeats=self.HEART_BEAT    # <0 no beat
         if(self.hbtimer==None):
-            self.hbtimer=Timer(5,self.beat)
+            self.hbtimer=Timer(10,self.beat)
             self.hbtimer.start()
         
     def beat(self):
-        self.heartBeats-=5;
+        self.heartBeats-=10;
         dprint(self.playerId+" second:",self.heartBeats)
         if(self.heartBeats>0):
             #self.hbtimer.cancel();
-            self.hbtimer=Timer(5,self.beat)
+            self.hbtimer=Timer(10,self.beat)
             self.hbtimer.start()
         else:
             dprint(self.playerId+" timeout!")
@@ -597,6 +611,25 @@ class Game(object):
             if(len(msgbox.messageBox)>0):
                 msg=msgbox.popMessage()
                 yield 'data: %s\n\n' % msg 
+            else:
+                time.sleep(0.1)
+        return
+    
+    def getMessage2(self,hallid,tableid,playerid):
+       
+        hall=self.halls[hallid]
+        player=hall.getPlayer(playerid)
+        if(player == None):
+            #player=hall.getPlayer(playerid)
+            #time.sleep(1)
+            return "data:{message:player not ready!\n\n"
+        
+        msgbox=player.messageBox
+        while(True):
+            if(len(msgbox.messageBox)>0):
+                msg=msgbox.popMessage()
+                dprint("poll msg: ",msg)
+                return '%s' % msg 
             else:
                 time.sleep(0.1)
         return

@@ -282,12 +282,22 @@ def opendoor():
 
 @app.route('/game1',methods=['GET', 'POST'])    
 def game():    
+    dprint("game sessions befor process:",flask.session)
     rtn,session=mygame.process(flask.request,flask.session) 
     flask.session=session
-    dprint("game sessions:",flask.session)
+    dprint("game sessions after process:",flask.session)
     djson=json.dumps(rtn)
     dprint(djson)
     return flask.Response(djson,headers={"Access-Control-Allow-Origin": "*"})
+
+@app.route('/gamelongpoll',methods=['GET', 'POST'])    
+def gamelongpoll():    
+    dprint("gamestream sessions:",flask.session)
+    hallid=flask.session["hallid"]
+    #tableid=flask.session["tableid"]
+    playerid=flask.session["playerid"]
+    return flask.Response(mygame.getMessage2(hallid,"",playerid), headers={"Access-Control-Allow-Origin": "*"},   
+                          )   
 
 @app.route('/gamestream')    
 def gamestream():    
@@ -344,7 +354,10 @@ def home():
 
 @app.route('/mygame/<path:path>')
 def serve_static(path):
+    if 'OPENSHIFT_REPO_DIR' in os.environ:
+        return flask.send_from_directory(os.environ['OPENSHIFT_REPO_DIR'], path)
     return flask.send_from_directory(os.getcwd(), path)
+
 
 if __name__ == '__main__':    
     app.debug = True 

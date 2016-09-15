@@ -425,7 +425,7 @@ function login(playerid,password){
 		function(json){
 			//log(json)
 			var djson=JSON.parse(json);
-			//log(djson)
+			log(djson)
 			if(djson["returncode"]!=0){
 				$(".LoginUI .Info").text(djson["errormessage"] )
 				$('.LoginUI').show()
@@ -702,7 +702,8 @@ var g24pPlayer={
  */
 var g24pTable={
 	createNew:function(type,name,size){
-		var table=SSETable.createNew(type,name,size);
+		//var table=SSETable.createNew(type,name,size);
+		var table=LPTable.createNew(type,name,size);
 		table.isComplete=false;
 		//table.isOnline=G24P.isOnline;
 		table.stage="";
