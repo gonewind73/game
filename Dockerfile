@@ -1,4 +1,4 @@
-FROM python:2.7.8
+FROM python:3.5.2
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt
 
 EXPOSE 3000
 
-CMD [ "python","application.py"]
+CMD [ "python","flask_app.py"]
