@@ -13,7 +13,7 @@ import os
 
 from rooms import rooms,Game
 from weixinmp import WeixinMp
-
+import config
 
 try:
     from config import dprint 
@@ -23,13 +23,12 @@ except:
         print(*args)
         
 #use redislite instead 2016.8.20
-try:
+if config.dbtype=="redislite":
     import redislite
     red = redislite.StrictRedis('redis.db')
-except:
+if config.dbtype=="redis":
     import redis
     red = redis.StrictRedis(host='localhost', port=6379, db=6)  
-
 
 
 app = flask.Flask(__name__,static_url_path="")    
@@ -39,7 +38,7 @@ myIps={};
 wxmp=WeixinMp({'token':"52128431",'appid':"wxd9d30601a109424b",'secret':"c8ed54032e0c7d8b8ba12c917e34af41"})
 
 mygame=Game()
-mygame.addHall("DDZ", "DDZhall")
+mygame.addHall("g24p", "g24p")
 
 #@app.before_request
 #def make_session_permanent():
@@ -271,14 +270,17 @@ def stream():
 
 @app.route('/opendoor')    
 def opendoor():    
-    fdoor = flask.request.form['door']  
-    command="tightvncserver&"
+    fdoor = flask.request.args['door']  
     #commamd="echo '731018'|sudo -S service ssh start"
     if(fdoor=="ssh"):
+        command="echo '731018'|sudo -S service ssh start"
         os.system(command)
-        return "open"
-    else:
-        return "not support!"
+        return "openssh"
+    elif fdoor=="vnc":
+        command="tightvncserver&"
+        os.system(command)
+        return "openvnc"
+    return "not support!"
 
 @app.route('/game1',methods=['GET', 'POST'])    
 def game():    
@@ -292,7 +294,7 @@ def game():
 
 @app.route('/gamelongpoll',methods=['GET', 'POST'])    
 def gamelongpoll():    
-    dprint("gamestream sessions:",flask.session)
+    dprint("gamespoll sessions:",flask.session)
     hallid=flask.session["hallid"]
     #tableid=flask.session["tableid"]
     playerid=flask.session["playerid"]

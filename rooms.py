@@ -17,6 +17,7 @@ import json
 from poke import Deck,Card
 from get24 import Point24
 #from time import sleep
+import sqlite3
 
 
 try:
@@ -26,7 +27,7 @@ except:
     def dprint(*args):
         print(*args)
         
-
+'''
 try:
     import redislite
     red = redislite.StrictRedis('redis.db')
@@ -44,14 +45,15 @@ except:
         redispassword=os.environ['REDIS_PASSWORD']
     red = redis.StrictRedis(host=redishost, port=redisport, password=redispassword,db=6)  
     #red = redis.StrictRedis(host='localhost', port=6379, db=6)  
-    
+'''
+        
 heartbeattime=60
 
 '''
 ["playerid","nickname","wealth","password"]
 {"playerid":"hgf","nickname":"baba","wealth":100,"password":1}
 '''
-
+'''
 class DB(object):
     def __init__(self):
         pass
@@ -63,6 +65,7 @@ class DB(object):
         if(not ("wealth" in userdict)):
             userdict["wealth"]=100
         red.hmset(userdict["playerid"],userdict)
+        
         return 0,"Success!"
     
     def login(self,userdict):
@@ -92,7 +95,112 @@ class DB(object):
         playerdict=self.getPlayerDict(playerid)
         return Player(playerid=playerdict["playerid"],nickname=playerdict["nickname"],
                       playertype=0,wealth=playerdict["wealth"])
+'''
+class DBSqlite(object):
+    conn=None
+    
+    def __init__(self):
+        #if(self.conn==None):
+        self.conn=sqlite3.connect('users.db')
+        if(not self.existTable("USERS")):
+            self.conn.execute('''CREATE TABLE USERS
+                           (ID  TEXT PRIMARY KEY     NOT NULL,
+                           NAME           TEXT    NOT NULL,
+                           WEALTH         INT     NOT NULL,
+                           PASSWORD       TEXT
+                           );''')
+        return
+    
+    '''
+    def close(self):
+        self.conn.commit();
+        self.conn.close();
+    '''
+    
+    def existTable(self,tablename):
+        cur=self.conn.execute("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='"+tablename+"'")
+        for row in cur:
+            if row[0]==0:
+                return False
+        return True
+    
+    def existUser(self,userid):
+        cur=self.conn.execute("SELECT count(*) FROM USERS WHERE ID='"+userid+"'")
+        for row in cur:
+            if row[0]==0:
+                return False
+        return True
+        
+    def addUser(self,userdict):
 
+        self.conn.execute("INSERT INTO USERS (ID,NAME,WEALTH,PASSWORD) VALUES ('"  \
+            +userdict["playerid"]+"','"+userdict["nickname"]+"',"+str(userdict["wealth"]) +",'"+userdict["password"]\
+            +"' )");
+        self.conn.commit()
+        return
+        
+    def getUser(self,userid):
+        cur=self.conn.execute("SELECT ID,NAME,WEALTH,PASSWORD FROM USERS WHERE ID='"+userid+"'")
+        for row in cur:
+            userdict={"playerid":row[0],
+                      "nickname":row[1],
+                      "wealth":row[2],
+                      "password":row[3]}
+            return userdict
+        return None
+    
+    def updateUser(self,userdict):
+        last=" "
+        if(self.existUser(userdict["playerid"])):
+            sqlstring="UPDATE USERS SET "
+            if "nickname" in userdict:
+                sqlstring += "NAME = '"+userdict["nickname"]+"'"
+                last=","
+            if "wealth" in userdict:
+                sqlstring += last+"WEALTH = "+str(userdict["wealth"])
+                last=","
+            if "password" in userdict:
+                sqlstring +=last+ "PASSWORD = '"+userdict["password"]+"'"    
+            sqlstring+=" where ID='"+userdict["playerid"]+"';"
+            self.conn.execute(sqlstring);
+            self.conn.commit()
+        else:
+            self.putUser2DB(userdict)
+        return
+        
+    def putUser2DB(self,userdict):
+        if(self.existUser(userdict["playerid"])):
+            return -1,"User have existed!"
+
+        if not "nickname" in userdict:
+            userdict["nickname"]=userdict["playerid"]
+        if(not ("wealth" in userdict)):
+            userdict["wealth"]=100
+        if not "password" in userdict:
+            userdict["password"]=""           
+        self.addUser(userdict)
+        return 0,"Success!"
+    
+    def login(self,userdict):
+        dbuser=self.getUser(userdict["playerid"])
+        if dbuser!=None :
+            if dbuser["password"]==userdict["password"]:
+                return 0
+        return -1
+    
+    def getPlayerDict(self,playerid):
+        return self.getUser(playerid)
+    
+    def update(self,userdict):
+        self.updateUser(userdict)
+        return 0,"Success!"
+    
+            
+    def getPlayer(self,playerid):
+        playerdict=self.getPlayerDict(playerid)
+        return Player(playerid=playerdict["playerid"],nickname=playerdict["nickname"],
+                      playertype=0,wealth=playerdict["wealth"])
+        
 class Player(object):
     HEART_BEAT=60
     def __init__(self,playerid,nickname="",playertype=0,wealth=100):
@@ -269,7 +377,7 @@ class Table(Players):
         self.deck=None
         self.stage=0  # 0 waiting  >0  playing 1 bidding  2 playing maybe 3
         self.lastcards=None
-        self.db=DB()
+        #self.db=DBSqlite()
         
         
     def enter(self,player):
@@ -364,7 +472,8 @@ class Table(Players):
             elif(action=="wealth"):
                 sender.wealth=msgdict[action];
                 self.broadcast({"tableinfo":self.getTableInfo()}, "system")
-                self.db.update(sender.getPlayerInfo())
+                db=DBSqlite()
+                db.update(sender.getPlayerInfo())
             elif(action=="message"):
                 self.broadcast({"message":msgdict[action]},sender.playerId)
             elif(action=="sender"):
@@ -462,13 +571,28 @@ Game
  get action=synchronize
  return tableinfo with cards info & lasterHander 
  
+ v2:
+ action:
+     login
+     register
+     intable
+     data
+     
+ 
+ response:
+     returncode:
+     codehint:
+     data:
+     
+ 
+ 
 '''       
         
 class Game(object):
     
     def __init__(self):
         self.halls={}
-        self.db=DB()
+        #self.db=DBSqlite()
         #self.deck=Deck(1)
         
     def addHall(self,hallid,hallname):
@@ -492,15 +616,16 @@ class Game(object):
         action = request.args['action']  
         if(action=="regist"):
             userdict=self.getDictFromDict(request.form, ["playerid","nickname","password","email"])
-            rtc,rtm=self.db.putUser2DB(userdict)
+            rtc,rtm=DBSqlite().putUser2DB(userdict)
             return {"returncode":rtc,"errormessage":rtm,"playerid":userdict["playerid"]},session
         elif(action=="login"):
             userdict=self.getDictFromDict(request.form, ["playerid","password"])
             dprint(userdict)
-            if(self.db.login(userdict)==0):
+            db=DBSqlite()
+            if(db.login(userdict)==0):
                 session["playerid"]=userdict["playerid"]
                 return {"returncode":0,"errormessage":"success!",
-                        "player":self.db.getPlayerDict(userdict["playerid"])},session
+                        "player":db.getPlayerDict(userdict["playerid"])},session
             else:
                 return {"returncode":-1,"errormessage":"something error!"},session
         elif(action=="enterhall"):
@@ -512,7 +637,7 @@ class Game(object):
                 hall=self.addHall(hallid, hallid)
             player=hall.getPlayer(playerid);
             if(player==None):
-                player=self.db.getPlayer(playerid)
+                player=DBSqlite().getPlayer(playerid)
                 hall.addPlayer(player)
             session["hallid"]=hallid
             #session["playerid"]=playerid
@@ -522,15 +647,15 @@ class Game(object):
             tableid=request.form["tableid"]
             #playerid=session["playerid"]
             hallid=session["hallid"]
-            dprint(hallid,tableid)
+            dprint(hallid,tableid,request.form)
             hall=self.halls[hallid]
             table=hall.getTable(tableid)
             if(table==None):
                 return {"returncode":40001,"errormessage":"table not found!"},session
             playerdict=request.form
-            player=table.getPlayer(playerdict["playerid"]);
-            if(player==None):
-                player=hall.getPlayer(playerdict["playerid"])
+            #player=table.getPlayer(playerdict["playerid"]);
+            #if(player==None):
+            player=hall.getPlayer(playerdict["playerid"])
             ok,rinfo=table.enter(player)
             
             dprint("process intable ",ok,rinfo)
@@ -584,8 +709,22 @@ class Game(object):
             rtmdict=table.processMessage(msgdict,player)
             return {"returncode":0,"errormessage":"success!"},session
         elif(action=="getmessage"):
-            #todo reget some message
-            pass
+           
+            hallid=session["hallid"]
+            tableid=session["tableid"]
+            playerid=session["playerid"]
+            hall=self.halls[hallid]
+            table=hall.getTable(tableid)
+            if(table==None):
+                return {"returncode":40001,"errormessage":"table not found!"},session
+            player=hall.getPlayer(playerid)
+            ok,rinfo=table.enter(player)
+            msgdict=request.form
+            rtmdict=table.processMessage(msgdict,player)
+            #return {"returncode":0,"errormessage":"success!",
+            #        "tableinfo":rinfo,"data":self.getMessage3(hallid, tableid, playerid)},session
+            return {"data":self.getMessage3(hallid, tableid, playerid)},session
+            
         elif(action=="synchronize"):
             hallid=session["hallid"]
             hall=self.halls[hallid]
@@ -604,7 +743,7 @@ class Game(object):
         if(player == None):
             #player=hall.getPlayer(playerid)
             #time.sleep(1)
-            return "data:{message:player not ready!\n\n"
+            return "data:{message:player not ready!}\n\n"
         
         msgbox=player.messageBox
         while(True):
@@ -622,7 +761,7 @@ class Game(object):
         if(player == None):
             #player=hall.getPlayer(playerid)
             #time.sleep(1)
-            return "data:{message:player not ready!\n\n"
+            return "data:{message:player not ready!}\n\n"
         
         msgbox=player.messageBox
         while(True):
@@ -633,6 +772,21 @@ class Game(object):
             else:
                 time.sleep(0.1)
         return
+    
+    #return message immediate
+    def getMessage3(self,hallid,tableid,playerid):
+        hall=self.halls[hallid]
+        player=hall.getPlayer(playerid)
+        if(player == None):
+            #player=hall.getPlayer(playerid)
+            #time.sleep(1)
+            return "{message:player not ready!}"
+        
+        msgbox=player.messageBox
+        if(len(msgbox.messageBox)>0):
+            msg=msgbox.popMessage()
+            return '%s' % msg 
+        return ""
     
 class DDZPlayer(Player):
     def __init__(self,playerid,nickname,wealth):

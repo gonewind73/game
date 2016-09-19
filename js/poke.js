@@ -738,7 +738,7 @@ var Table={
 				if(table.heartbeatTimer!=null){
 					clearTimeout(table.heartbeatTimer)
 					table.heartbeatTimer=null;
-					table.heartbeat=null;
+					//table.heartbeat=null;
 				}
 				
 				var p=Player.getPlayer(table.players,table.selfid)
@@ -823,8 +823,9 @@ var SSETable = {
 							errorcount++;
 							if(errorcount>3){
 								$('.log').text("sse error count>3!")
-								table.leave2()
 								table.isOnline=false;
+								table.leave2()
+								
 							}
 						};
 					table.source.onopen=function(event){
@@ -901,6 +902,7 @@ var LPTable = {
 								$('.log').text("longpoll error count>3!")
 								table.isOnline=false;
 								table.leave();
+								errorcount=0;
 							}
 							//if(table.intable)poll()
 						},
@@ -915,7 +917,7 @@ var LPTable = {
 				if(table.isInited)return;
 				errorcount=0;
 				poll()
-				table.onevent("onopen",{});  //调用open
+				//table.onevent("onopen",{});  //调用open
 				table.isInited=true;
 			};
 
@@ -937,7 +939,146 @@ var LPTable = {
 		 * load a table from dictionary
 		 */
 		load:function(td){
-			var table=SSETable.createNew(td.tabletype,td.tableid,td.tablesize);
+			var table=LPTable.createNew(td.tabletype,td.tableid,td.tablesize);
+			var players=[]
+			for( p in td.players){
+				var player=Player.load(td.players[p])
+				players.push(player)
+			}
+			table.players=players;
+			table.master=td.owner;
+			return table;
+		},
+	}
+
+/*
+ * table with longpull support same as heartbeat
+ */
+
+var LP2Table = {
+		createNew:function(type,name,size){
+			var table=Table.createNew(type,name,size);
+			
+			var enterUrl="/game1?action=intable"
+			var leaveUrl="/game1?action=leavetable"
+			var infoUrl="/game1?action=tableinfo"
+			var ssePostUrl="/game1?action=sendmessage";
+			var longPollUrl="/game1?action=getmessage";
+						
+			table.isInited=false;
+			var errorcount=0;
+			var timeout=1000;
+			var broadcastdatas=[];
+			var beatcount=0;
+			var spacecount=0;
+			
+			//check if need beat then poll
+			table.heartbeat=function(){     
+				if(beatcount<=0){
+					poll()
+					beatcount=10*(spacecount+1)   //2s 
+				}
+				beatcount--;
+			}
+			
+			function poll(){
+				var broadcastdata=""
+				if(broadcastdatas.length>0){
+					broadcastdata=broadcastdatas.shift()
+				}
+				$.ajax({ type: 'POST',
+		    	   		url: longPollUrl,
+		    	   	
+		    	   	 /*
+		    	   	    beforeSend: function(jqXHR, settings) {
+		    	             jqXHR.setRequestHeader('Accept', 'text/plain; charset=utf-8');
+		    	             jqXHR.setRequestHeader('Content-Type', 'text/plain; charset=utf-8');
+		    	             jqXHR.setRequestHeader('User-Agent','mybrower');
+		    	             jqXHR.setRequestHeader("custom-header", "custom-info") ;
+		    	         },*/
+		    	   		data: broadcastdata,
+		    	   		success: function(data) {
+		    	   			errorcount=0;
+		    	   			if(data==""){
+		    	   				return;
+		    	   			}
+		    	   			var r=JSON.parse(data)
+		    	   			if(r.data!=""){
+		    	   				spacecount=0;
+		    	   				table.onevent("onchatdata",{"data":r.data});
+		    	   				setTimeout(poll ,100)    //if have data then poll inmediate
+		    	   			}else{
+		    	   				spacecount++;
+		    	   				if(spacecount>4)spacecount=4;
+		    	   			}
+		    	   			
+		    	   		}, 
+		    	   		error:function(ml,err){
+		    	   			log(err)
+		    	   			if(err=="timeout")return;
+							errorcount++;
+							if(errorcount>3){
+								$('.log').text("longpoll error count>3!")
+								table.isOnline=false;
+								table.leave();
+								errorcount=0;
+							}
+							//if(table.intable)poll()
+						},
+		    	   		dataType: "text", 
+		       			complete: function(){
+		       			/*	if(table.isOnline){
+		       					setTimeout(poll ,timeout)
+		       				}*/
+		       			},
+		       			timeout:10000,
+					});
+			}
+			
+			table.clientInit=function(){
+				if(table.isInited)return;
+				errorcount=0;
+				//table.onevent("onopen",{});  //调用open
+				
+				table.isInited=true;
+			};
+			
+			table.enter=function(player){
+				player.intable(table)
+				table.players.addPlayer(player)
+				table.selfid=player.id;
+				
+				table.info();
+
+				if(table.heartbeatTimer==null){
+					table.heartbeatTimer=setInterval(table.heartbeat,100);  //10s refresh
+				}	
+
+				return;
+			}
+
+			//data is a dict
+			table.broadcast=function(data){
+				if(!table.intable) return
+				broadcastdatas.push(data);
+				beatcount=0;
+				//$.post(ssePostUrl,data);						
+				return;
+			};	
+			
+			table.leave2=function(){
+				table.leave()
+				table.isOnline=false;
+			};
+			
+			return table;
+		},
+		
+		/*
+		 * load a table from dictionary
+		 */
+		load:function(td){
+			var table=LPTable.createNew(td.tabletype,td.tableid,td.tablesize);
 			var players=[]
 			for( p in td.players){
 				var player=Player.load(td.players[p])

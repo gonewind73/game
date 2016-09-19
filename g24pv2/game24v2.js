@@ -545,8 +545,10 @@ function loadConfig(){
 	if(data.isonline){
 		g24pDisplay("login");
 	}else{
-		if(!!G24P.table)
+		if(!!G24P.table){
 			if(G24P.table.intable)G24P.table.leave2()
+			
+		}
 		
 		var td={"tablesize": 2, 
 				"tabletype": "g24p",
@@ -703,7 +705,7 @@ var g24pPlayer={
 var g24pTable={
 	createNew:function(type,name,size){
 		//var table=SSETable.createNew(type,name,size);
-		var table=LPTable.createNew(type,name,size);
+		var table=LP2Table.createNew(type,name,size);
 		table.isComplete=false;
 		//table.isOnline=G24P.isOnline;
 		table.stage="";
