@@ -9,7 +9,9 @@ application.debug = True
 def hello_world():
   storage = Storage()
   storage.populate()
+  print("get score:")
   score = storage.score()
+  print(score)
   return "Hello Beijing 123, %d!" % score
 
 class Storage():
