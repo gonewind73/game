@@ -1,7 +1,7 @@
 Flask==0.10.1
 requests
 #redis==2.10.5
-#redislite==3.0.296
+redislite==3.0.296
 
 # ----------------------
 # Production Server
