@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<HTML xmlns="http://www.w3.org/1999/xhtml"
+	class=" canvas canvastext geolocation rgba hsla multiplebgs borderimage borderradius boxshadow opacity cssanimations csscolumns cssgradients cssreflections csstransforms csstransforms3d csstransitions  video audio localstorage sessionstorage webworkers applicationcache fontface">
+<head>
+
+
+<meta charset="UTF-8">
+<title>斗地主</title>
+
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="shortcut icon" type="image/x-icon" href="../img/g24.ico" media="screen" />
+<meta name="keywords" content="网页  游戏  斗地主">  
+<meta name="description" content="老少皆宜的益智游戏。纯净版，本版本支持单机游戏，在chrome中支持联机远程互动。">   
+<meta name="author" content="gonewind,gonewind08@qq.com"> 
+<link href="doudizhu.css" rel="stylesheet">
+
+<script src="../js/jquery-1.4.2.min.js"></script>
+<SCRIPT type="text/javascript" src="../js/zach.min.js"></SCRIPT>
+<SCRIPT type="text/javascript" src="../js/modernizr-1.1.min.js"></SCRIPT>
+<script type="text/javascript" src="../js/peer.js"></script>
+
+<script src="doudizhu2.js"></script>
+
+</head>
+
+<body>
+<section id="DDZ">
+
+		<div id="player1" class=Player>
+			<span class="playername">宝宝</span>
+			<span class="Score">0</span>
+		</div>
+		<div id="player2" class=Player>
+			<span class="playername">胡歌</span>
+			<span class="Score">0</span>
+		</div>
+		<div id="player3" class="Player">
+			<span  class="playername">关之琳</span>
+			<span  class="Score">0</span>
+		</div>
+		<div id="landowner"></div><div id="nongming1"></div><div id="nongming2"></div>
+		
+		<div id="Shoe"></div>
+		<div id="Cards">
+			<div id="Player1Cards"></div>
+			<div id="Player2Cards"></div>
+			<div id="Player3Cards"></div>
+			<div id="PlayedCards"></div>
+			<div id="Player1PlayedCards"></div>
+			<div id="Player2PlayedCards"></div>
+			<div id="Player3PlayedCards"></div>
+			<div id="LandownerCards"></div>
+		</div>
+		
+		<div id="Actions">
+		<div id="PlayAction">
+			<a href="#" id="Pass" class="Action " title="不要"></a>
+			<a href="#" id="Put" class="Action " title="出牌"></a>	
+		</div>
+		<div id="ScoreAction">		
+			<a href="#" id="Point0" class="Action" title="不叫"></a>
+			<a href="#" id="Point1" class="Action" title="1分"></a>
+			<a href="#" id="Point2" class="Action" title="2分"></a>
+			<a href="#" id="Point3" class="Action" title="3分"></a>
+		</div>
+		<div id="SetAction">	
+			<a href="#" id="Help" class="Action" title="帮助"></a>
+			<a href="#" id="Setup" class="Action" title="设置"></a>
+		</div>
+		</div>
+		<div id="Message"></div>
+		<div class="Chat">
+			<select id="presetmessage" name="presetmessage">
+				<option value="快点出">快出</option>
+				<option value="等到花儿都谢了">花谢了</option>
+				<option value="这么慢">慢</option>
+				<option value="有事走了">再见</option>
+				</select>
+				<input id="button" type="button" value="发送" onclick="chatmessage()">
+	    	<input type="text" id="chatmessage" placeholder="what you want to say?" value="">
+	    </div>
+		<div id="Points">0</div>
+		
+		<div id="TimeRemain">0.0</div>
+		
+		<div class="help"><textarea   
+		style= "resize:none;overflow-y: auto; background-color:#FFF0D4;" readonly="readonly">
+欢迎使用斗地主。  Version 1.0  (点击上方 ? 按钮 关闭此窗口)
+(系统缺省为单机游戏，你和两个电脑玩，也可以选择联机游戏，请参见13)
+
+游戏规则：
+1、点击图中央的扑克标记，发牌；每人17张，3张等待叫分。
+2、发牌后，即进入叫分阶段，根据牌型进行叫分，每人叫分限时60秒，没有叫分的视为不叫，交由下一玩家叫分。
+3、叫分最多者为地主（最多三分），拿入余下的三张底牌，同时显示三张底牌；
+4、叫分结束后，进入打牌阶段，每人限时60秒，如果没有出牌，系统自动出牌。
+5、可以出的牌型  X 1张、XX 1对、XXX 3个头、XXXY 3带1个、XXXYY 3带1对，XXXX 4个头(炸弹), 大小王对(火箭，最大)
+6、可以出顺子，X(X+1)(X+2)...(X+4)... 或XX(X+1 X+1)(X+2 X+2)...或 XXX(X+1 X+1 X+1)... 顺子至少5张 ，对顺至少3对，
+7、三顺还可以带一个或一对，如XXXYY(X+1 X+1 X+1 ZZ)...  或  XXXY(X+1 X+1 X+1 Z)，顺中每一个带的牌型需一致，即都是单或都是对
+8、4个作为炸弹时，不能带，如果出牌，可以带1个，也可以带1对，也可以带1个三头
+9、最终出完者为胜利者。如果胜者为地主，每个农民需缴纳最终叫成的分数，如果胜者为农民，则地主向每个农民缴纳最终叫成的分数。
+10、如果在出牌过程中，出现炸弹或火箭，将增加分数，1个炸弹1分。如果原来叫分3分，牌局出现2个炸弹，则最终分数为5分。 
+11、牌局结束后，会显示所有人留下的牌，供复牌。点击图中央会清理牌桌，开始下一轮。
+12、轮到你出牌时，可点击自己的标牌，可提示可出的牌。
+13、选择联机游戏，请点击正上方齿轮图标，务必设置自己的名称(玩家1)和房间号，房间号请和联机的人约定好同一个房间号，
+14、勾选联机，点击确认键后，等待系统同步，所有人都显示在自己的画面中后，可开始游戏。
+15、联机游戏如果只有两人游戏，则系统会自动增加一个电脑角色。
+16、可以关闭声音，在设置中不勾选声音并点击OK图标即可。此可以在游戏过程中设置。
+17、点击其他玩家图标，可以进行消息发送，可选择预设的，也可以自己编写文字消息。
+
+为更好的体验，建议横屏游戏!
+
+任何改进建议请发邮件给 gonewind08@qq.com
+ (点击上方 ? 按钮 关闭此窗口)
+</textarea> 或<a href="https://www.wenjuan.com/s/6VRVJv/">点击此处反馈</a></div>
+
+<div class="setup">
+	<div class="switch" id="onlinesw">在线<input id="online" type="checkbox" ></div>
+	<div class="switch" id="speakersw">声音<input id="speaker" type="checkbox" checked></div>
+	<div class="inputtype" id="player1">玩家1<input type="text" id="player1name" placeholder="player1" value=""></div>
+	<div class="inputtype" id="player2">玩家2<input type="text" id="player2name" placeholder="player2" value=""></div>
+	<div class="inputtype" id="player3">玩家3<input type="text" id="player3name" placeholder="player3" value=""></div>
+	<div class="inputtype" id="room">房间号<input type="text" id="roomid" placeholder="room1" value="">
+	    <input type="text" id="level" placeholder="" value=""></div>
+	<div >
+	     <a href="#" id="OK" class="Action"></a> 
+	     <a href="#" id="Cancel" class="Action"></a>
+	</div>			
+</div>
+
+		<div class="cyr">By 何国锋</div>
+		<div class="log"></div>
+		<div class="offline"></div>
+		<div id="sound">
+			<audio id="sound3" src="../sound/3.mp3" ></audio>
+			<audio id="sound4" src="../sound/4.mp3" ></audio>
+			<audio id="sound5" src="../sound/5.mp3" ></audio>
+			<audio id="sound6" src="../sound/6.mp3" ></audio>
+			<audio id="sound7" src="../sound/7.mp3" ></audio>
+			<audio id="sound8" src="../sound/8.mp3" ></audio>
+			<audio id="sound9" src="../sound/9.mp3" ></audio>
+			<audio id="sound10" src="../sound/10.mp3" ></audio>
+			<audio id="sound11" src="../sound/11.mp3" ></audio>
+			<audio id="sound12" src="../sound/12.mp3" ></audio>
+			<audio id="sound13" src="../sound/13.mp3" ></audio>
+			<audio id="sound14" src="../sound/14.mp3" ></audio>
+			<audio id="sound16" src="../sound/16.mp3" ></audio>
+			<audio id="sound80" src="../sound/80.mp3" ></audio>
+			<audio id="sound90" src="../sound/90.mp3" ></audio>
+			
+			<audio id="sound3_3" src="../sound/3_3.mp3" ></audio>
+			<audio id="sound4_4" src="../sound/4_4.mp3" ></audio>
+			<audio id="sound5_5" src="../sound/5_5.mp3" ></audio>
+			<audio id="sound6_6" src="../sound/6_6.mp3" ></audio>
+			<audio id="sound7_7" src="../sound/7_7.mp3" ></audio>
+			<audio id="sound8_8" src="../sound/8_8.mp3" ></audio>
+			<audio id="sound9_9" src="../sound/9_9.mp3" ></audio>
+			<audio id="sound10_10" src="../sound/10_10.mp3" ></audio>
+			<audio id="sound11_11" src="../sound/11_11.mp3" ></audio>
+			<audio id="sound12_12" src="../sound/12_12.mp3" ></audio>
+			<audio id="sound13_13" src="../sound/13_13.mp3" ></audio>
+			<audio id="sound14_14" src="../sound/14_14.mp3" ></audio>
+			<audio id="sound16_16" src="../sound/16_16.mp3" ></audio>
+			<audio id="sound80_90" src="../sound/80_90.mp3" ></audio>
+			
+			<audio id="soundcomb3_1" src="../sound/comb3_1.mp3" ></audio>
+			<audio id="soundcomb3_2" src="../sound/comb3_2.mp3" ></audio>
+			<audio id="soundcomb4_2" src="../sound/comb4_2.mp3" ></audio>
+			<audio id="soundcomb6_2" src="../sound/comb6_2.mp3" ></audio>
+			<audio id="soundbomb" src="../sound/bomb0.mp3" ></audio>
+			
+			<audio id="soundwin" src="../sound/win1.mp3" ></audio>
+			<audio id="soundpass" src="../sound/pass3.mp3" ></audio>
+			<audio id="soundpoint0" src="../sound/point0.mp3" ></audio>
+			<audio id="soundpoint1" src="../sound/point1.mp3" ></audio>
+			<audio id="soundpoint2" src="../sound/point2.mp3" ></audio>
+			<audio id="soundpoint3" src="../sound/point3.mp3" ></audio>
+			<audio id="soundorder1" src="../sound/order1.mp3" ></audio>
+			<audio id="soundorder2" src="../sound/order2.mp3" ></audio>
+			<audio id="soundorder3" src="../sound/order3.mp3" ></audio>			
+			<!--  <audio id="soundbg" src="../sound/bg.mp3"  autoplay="auto" loop="loop" Volume="10"></audio>
+			-->
+		</div>
+		
+</section>
+</body>
+</html>
