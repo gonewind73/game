@@ -1,2 +1,1 @@
-# game
-主要提供在线游戏消息递送
+This sample demonstrates how to setup DaoCloud CI for a Python+MySQL project.

@@ -8,7 +8,7 @@ Created on 2016年8月24日
 #ddz configuration
 
 redistype = 0  # 0　no redis  1 redis  2 redistype
-dbtype="sqlite"
+dbtype="redislite"
 webport = 5000 
 debug=True
 
