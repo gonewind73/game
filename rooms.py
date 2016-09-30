@@ -16,8 +16,10 @@ import time
 import json
 from poke import Deck,Card
 from get24 import Point24
-#from time import sleep
 import sqlite3
+
+import os
+
 
 
 try:
@@ -101,7 +103,10 @@ class DBSqlite(object):
     
     def __init__(self):
         #if(self.conn==None):
-        self.conn=sqlite3.connect('users.db')
+        #self.conn=sqlite3.connect('users.db')
+        dbpath=os.getenv("DBPATH", "")
+        self.conn=sqlite3.connect(dbpath+"users.db")
+        
         if(not self.existTable("USERS")):
             self.conn.execute('''CREATE TABLE USERS
                            (ID  TEXT PRIMARY KEY     NOT NULL,
