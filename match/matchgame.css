@@ -1,0 +1,178 @@
+body
+{
+    text-align: center;
+    background-image: url("../img/Floor.jpg");
+    color:#FFF;
+}
+
+#game
+{
+    width: 502px;
+    height: 562px;
+    margin: 0 auto;
+    border: 1px solid #666;
+    border-radius: 10px;
+    background-image: url("../img/Floor.jpg");
+    position: relative;
+    display: -webkit-box;
+    -webkit-box-pack:center;
+    -webkit-box-align:center;
+}
+#cards
+{
+	
+    width: 380px;
+    height: 400px;
+    /*position: relative;*/
+	
+}
+.card
+{
+	width:138px;
+	height:200px;
+	display:block;
+	position:absolute;
+	transform: scale(0.5);
+}
+.face
+{
+    width: 100%;
+    height: 100%;
+    border-radius:10px;
+    position: absolute;
+    -webkit-backface-visibility: hidden;
+    -webkit-transition:all .3s;
+}
+.front
+{
+    width:100%;
+	height:100%;
+	position:absolute;
+	background-color:#FFF;
+	-moz-box-shadow:0px 5px 5px #000;
+	-webkit-box-shadow:0px 5px 5px #000;
+    background-image:url(../img/Back.png);
+    z-index: 10;
+    transform:scale(1,1)
+}
+.back
+{
+	width:100%;
+	height:100%;
+	position:absolute;
+	background-color:#FFF;
+	-moz-box-shadow:0px 5px 5px #000;
+	-webkit-box-shadow:0px 5px 5px #000;
+    -webkit-transform-rotateY(-180deg);
+    z-index: 8;
+}
+.face:hover
+{
+    -webkit-box-shadow: 0 0 40px #aaa;
+
+}
+/*牌面定位样式*/
+.cardAJ{
+	background-image:url(../img/Hearts.png);
+	background-position: -1380px 0;
+	}
+.cardAQ{
+	background-image:url(../img/Hearts.png);
+	background-position: -1518px 0;}
+.cardAK{
+	background-image:url(../img/Hearts.png);
+	background-position: -1656px 0;}
+.cardBJ{
+	background-image:url(../img/Spades.png);
+	background-position: -1380px 0px;}
+.cardBQ{
+	background-image:url(../img/Spades.png);
+	background-position: -1518px 0px;}
+.cardBK{
+	background-image:url(../img/Spades.png);
+	background-position: -1656px 0px;}
+
+.card-flipped .front
+{
+    /*保证牌底在牌面下面，z-index值切换为小值*/
+    z-index: 8;
+    -webkit-transform: rotateY(180deg);
+}
+.card-flipped .back
+{
+    /*保证牌底在牌面上面，z-index值切换为大值*/
+    z-index: 10;
+    /*前面牌面已经翻过去，现在返回来*/
+    -webkit-transform: rotateY(0deg);
+}
+/*移除牌*/
+.card-removed
+{
+    opacity: 0;
+}
+
+#TimeRemain{
+	position:absolute;
+	left:70%;
+	top:10px;
+	width:200px;
+	height:60px;
+	margin-top:20px;
+	font-size: 28px;
+	opacity:0.75;
+	text-align:center;
+	overflow:visible;
+	text-shadow:0px 5px #000;
+}
+
+#Actions{
+	position:absolute;
+	left:10%;
+	top:85%;
+	width:400px;
+	height:60px;
+	margin-left:10px;
+	margin-top:0px;
+	
+}
+
+.Action{
+	position:absolute;
+	
+	width:60px;
+	height:60px;
+	
+	-moz-border-radius:30px;
+	-webkit-border-radius:30px;
+	
+	display:block;
+	background-image:url(../img/Actions.png);
+}
+
+.Action#Next{
+	background-position:0px 0px;
+}
+
+
+
+#Help{
+	position:absolute;
+	background-image:url(../img/help.jpg);
+	background-position:0px 0px;
+	width:60px;
+	height:60px;
+	-moz-border-radius:30px;
+	-webkit-border-radius:30px;
+	left:300px;
+	top:0px;
+	transform:scale(0.8,0.8)
+}
+
+.cyr {
+	position:absolute;
+	text-align:center;
+	margin-top:0px;
+	left:40%;
+	top:95%;
+	
+	}

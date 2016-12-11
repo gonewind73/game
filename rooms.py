@@ -17,10 +17,7 @@ import json
 from poke import Deck,Card
 from get24 import Point24
 import sqlite3
-
 import os
-
-
 
 try:
     from config import dprint 
