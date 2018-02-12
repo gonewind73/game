@@ -241,16 +241,17 @@ def get189token():
         fuser_token=flask.request.form['access_token']
         if fuser and fuser_token:
             token_189[fuser] = fuser_token
-        return flask.redirect('/get189token?userid='+fuser)
+        return '请返回程序界面继续！'
     if flask.request.method == 'GET':
         if len(flask.request.args):
             fuser=flask.request.args.get('userid','')
             fuser_token=flask.request.args.get('access_token','')
             if fuser and fuser_token:
                 token_189[fuser] = fuser_token
+                return '请返回程序界面继续！'
             data = {fuser:token_189[fuser]}
             djson=json.dumps(data)
-            return flask.Response(djson,headers={"Location":"http://127.0.0.1"})
+            return flask.Response(djson)
         else:
             return '<form action="/get189token" method="post">userid: <input type=text name="userid">token: <input type="text" name="access_token"><input type="submit" value="Submit"></form>'
 
