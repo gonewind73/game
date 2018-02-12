@@ -35,6 +35,7 @@ app = flask.Flask(__name__,static_url_path="")
 app.secret_key = 'asdf'    
 myRooms=rooms(100)
 myIps={};
+token_189 = {}
 wxmp=WeixinMp({'token':"52128431",'appid':"wxd9d30601a109424b",'secret':"c8ed54032e0c7d8b8ba12c917e34af41"})
 
 mygame=Game()
@@ -231,6 +232,21 @@ def weixin1():
     r=requests.get("http://"+myIps["myRemoteIp"]+":5000/weixin2"+fullpath)
     dprint("return: ",r.text)
     return r.text;
+
+#2018.2.12 189Disk get Token
+@app.route('/get189token', methods=['GET', 'POST'])    
+def get189token():    
+    fuser=flask.request.form['userid']
+    fuser_token=flask.request.form['access_token']
+    if fuser and fuser_token:
+        token_189[fuser] = fuser_token
+    if fuser:
+        data = {fuser:token_189[fuser]}
+        djson=json.dumps(data)
+        dprint(data)
+        return flask.Response(djson,headers={"Access-Control-Allow-Origin": "*"})
+    return '<form action="/get189token" method="post">userid: <input type=text name="userid">token: <input type="text" name="access_token"><input type="submit" value="Submit"></form>'    
+
 
  
 @app.route('/login', methods=['GET', 'POST'])    
