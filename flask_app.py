@@ -364,6 +364,7 @@ def on_close():
 
 @app.route('/')
 def home():
+    return flask.render_template('index.html')
     if 'user' not in flask.session:
         return flask.redirect('/login')
     return u"""
