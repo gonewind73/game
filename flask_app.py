@@ -256,17 +256,27 @@ def get189token():
             return '<form action="/get189token" method="post">userid: <input type=text name="userid">token: <input type="text" name="access_token"><input type="submit" value="Submit"></form>'
 
 #2018.2.20 upload
-@app.route('/upload', methods=['POST', 'GET'])
+@app.route('/safebook/upload', methods=['POST', 'GET'])
 def upload():
     if flask.request.method == 'POST':
+        fuser = flask.request.args.get('userid','')
         datafile = flask.request.files['datafile']
-        print(os.path.join(r'/home/joygame2/',datafile.filename))
-        datafile.save(os.path.join(r'/home/joygame2/',datafile.filename))
+        filepath = os.path.join(r'/home/joygame2/',fuser+"_"+datafile.filename)
+        datafile.save(filepath)
         return 'filename is %s ' % datafile.filename
     else:
         return '<html><head lang="en"><meta charset="UTF-8"><title>uploadfile</title></head>  \
                 <body><form action="" method="post" enctype="multipart/form-data"> upload: <input type="file" name="datafile"><input type="submit" name="upload"> </form> </body> </html>    '
 
+
+
+@app.route('/safebook/download', methods=['GET'])
+def download():
+    fuser = flask.request.args.get('userid','')
+    response = flask.make_response(flask.send_file(os.path.join(r'/home/joygame2/',fuser+'_safebook.sbr')))
+    response.headers["Content-Disposition"] = "attachment; filename=safebook.sbr;"
+
+    return response
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
