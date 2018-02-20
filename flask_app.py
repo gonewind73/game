@@ -255,6 +255,17 @@ def get189token():
         else:
             return '<form action="/get189token" method="post">userid: <input type=text name="userid">token: <input type="text" name="access_token"><input type="submit" value="Submit"></form>'
 
+#2018.2.20 upload
+@app.route('/upload', methods=['POST', 'GET'])
+def upload():
+    if flask.request.method == 'POST':
+        datafile = flask.request.files['datafile']
+        print(os.path.join(r'/home/joygame2/',datafile.filename))
+        datafile.save(os.path.join(r'/home/joygame2/',datafile.filename))
+        return 'filename is %s ' % datafile.filename
+    else:
+        return '<html><head lang="en"><meta charset="UTF-8"><title>uploadfile</title></head>  \
+                <body><form action="" method="post" enctype="multipart/form-data"> upload: <input type="file" name="datafile"><input type="submit" name="upload"> </form> </body> </html>    '
 
 
 @app.route('/login', methods=['GET', 'POST'])
