@@ -34,6 +34,7 @@ if config.dbtype=="redis":
 app = flask.Flask(__name__,static_url_path="")
 app.secret_key = 'asdf'
 myRooms=rooms(100)
+p2p_net_nodes = {}
 myIps={};
 token_189 = {}
 wxmp=WeixinMp({'token':"52128431",'appid':"wxd9d30601a109424b",'secret':"c8ed54032e0c7d8b8ba12c917e34af41"})
@@ -277,6 +278,26 @@ def download():
     response.headers["Content-Disposition"] = "attachment; filename=safebook.sbr;"
 
     return response
+
+@app.route('/p2pnet/public',methods=['GET','POST'])
+def public():
+    if flask.request.method == 'POST':
+        net_id = flask.request.args.get('net_id','')
+        node_id = flask.request.args.get('node_id','')
+        ip = flask.request.args.get('ip','')
+        port = flask.request.args.get('port','')
+        nat_type = flask.request.args.get('nat_type','')
+        nodes = p2p_net_nodes.get(net_id,{})
+        nodes[node_id] = (ip,port,nat_type)
+        p2p_net_nodes[net_id] = nodes
+
+        return 'total %d node in net %s ' % (len(nodes),net_id)
+    else: #get
+        net_id = flask.request.args.get('net_id','')
+        djson=json.dumps(p2p_net_nodes.get(net_id,{}))
+        return flask.Response(djson)
+
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
