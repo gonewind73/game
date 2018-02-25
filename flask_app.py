@@ -288,13 +288,19 @@ def public():
         port = flask.request.args.get('port','')
         nat_type = flask.request.args.get('nat_type','')
         nodes = p2p_net_nodes.get(net_id,{})
-        nodes[node_id] = (ip,port,nat_type)
+        nodes[node_id] = (ip,port,nat_type,time.time())
         p2p_net_nodes[net_id] = nodes
 
         return 'total %d node in net %s ' % (len(nodes),net_id)
     else: #get
         net_id = flask.request.args.get('net_id','')
-        djson=json.dumps(p2p_net_nodes.get(net_id,{}))
+        nodes = p2p_net_nodes.get(net_id,{})
+        now = time.time()
+        alive_node = {}
+        for node in nodes:
+            if now - nodes[node][3] < 600 :
+                alive_node[node] = nodes[node]
+        djson=json.dumps(alive_node)
         return flask.Response(djson)
 
 
