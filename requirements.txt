@@ -1,4 +1,4 @@
-Flask==0.10.1
+Flask==1.0
 requests
 #redis==2.10.5
 redislite==3.0.296
